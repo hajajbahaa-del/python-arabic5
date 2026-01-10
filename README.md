@@ -1,4 +1,4 @@
-
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -223,11 +223,6 @@
 <script>
 /* ============================================================================
    Single-file Platform (LocalStorage)
-   - Generations -> Tasks -> Task Documents
-   - Python Lessons (Presentation style)
-   - Admin controls naming + adding
-   - Login/Register per device
-   - Save last visited content per user
 ============================================================================ */
 
 const LS_KEY = "btec_platform_v4";
@@ -312,15 +307,9 @@ function seedData(){
       { id:"g_2009", name:"جيل 2009", desc:"" },
       { id:"g_2010", name:"جيل 2010", desc:"" }
     ],
-    tasks: [
-      // فارغة افتراضياً — أنت بتضيف المهمات بأسمائها من الأدمن
-    ],
-    taskDocs: [
-      // { id, taskId, displayName, filename, mime, size, dataUrl, createdAt }
-    ],
-    pythonLessons: [
-      // { id, title, slides:[{title, bullets, code}], createdAt }
-    ]
+    tasks: [],
+    taskDocs: [],
+    pythonLessons: []
   };
 }
 
@@ -889,7 +878,6 @@ function renderAdmin(){
 
     <div class="grid" style="margin-top:14px">
 
-      <!-- Add Generation -->
       <div class="card">
         <div class="cardHeader">
           <div>
@@ -920,7 +908,6 @@ function renderAdmin(){
         </div>
       </div>
 
-      <!-- Add Task -->
       <div class="card">
         <div class="cardHeader">
           <div>
@@ -962,7 +949,6 @@ function renderAdmin(){
         </div>
       </div>
 
-      <!-- Upload Task Document (Gen -> Task) -->
       <div class="card">
         <div class="cardHeader">
           <div>
@@ -1010,7 +996,6 @@ function renderAdmin(){
         </div>
       </div>
 
-      <!-- Add Python Lesson (presentation) -->
       <div class="card">
         <div class="cardHeader">
           <div>
@@ -1019,7 +1004,7 @@ function renderAdmin(){
           </div>
         </div>
 
-        <!-- ✅ هنا الإصلاح -->
+        <!-- ✅ فورم بدون submit حقيقي + زر حفظ Button -->
         <form class="form" onsubmit="event.preventDefault(); return false;">
           <label>عنوان الدرس</label>
           <input id="pyTitle" placeholder="مثال: المتغيرات في بايثون" required>
@@ -1027,7 +1012,6 @@ function renderAdmin(){
           <div class="split">
             <div>
               <label>عنوان الشريحة</label>
-              <!-- ✅ شلنا required عشان ما يمنع حفظ الدرس -->
               <input id="pySlideTitle" placeholder="مثال: ما هو المتغير؟">
             </div>
             <div>
@@ -1042,8 +1026,6 @@ function renderAdmin(){
           <div class="row">
             <button class="btn dark" type="button" onclick="addSlideToDraft()">+ إضافة الشريحة إلى المسودة</button>
             <span class="pill" id="draftCount">0 شريحة</span>
-
-            <!-- ✅ زر حفظ الدرس صار type=button عشان ما يشتغل عليه required تبع الشريحة -->
             <button class="btn" type="button" onclick="addPythonLesson()">حفظ الدرس</button>
           </div>
 
@@ -1089,7 +1071,6 @@ function resetAll(){
   if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(PROGRESS_KEY);
-  // DEVICE_KEY لا نحذفه حتى يظل الجهاز معروف
   showAlert("ok","تمت إعادة الضبط");
   route();
 }
@@ -1275,22 +1256,46 @@ function removeDraftSlide(i){
   renderDraftPreview();
 }
 
+/* ✅ الإصلاح النهائي: حفظ الدرس بدون مشاكل required */
 function addPythonLesson(){
   const db = loadDB();
-  const title = ($("#pyTitle").value||"").trim();
-  if(!title){ showAlert("bad","اكتب عنوان الدرس"); return; }
-  if(PY_DRAFT.length === 0){ showAlert("bad","لازم تضيف على الأقل شريحة واحدة"); return; }
+
+  const titleEl = $("#pyTitle");
+  const title = (titleEl?.value || "").trim();
+
+  if(!title){
+    showAlert("bad","اكتب عنوان الدرس");
+    return;
+  }
+
+  if(!Array.isArray(PY_DRAFT) || PY_DRAFT.length === 0){
+    showAlert("bad","لازم تضيف على الأقل شريحة واحدة (اضغط + إضافة الشريحة)");
+    return;
+  }
+
+  const slides = PY_DRAFT.map(s => ({
+    title: (s.title || "").trim() || "شريحة",
+    bullets: Array.isArray(s.bullets) ? s.bullets.map(x=>String(x).trim()).filter(Boolean) : [],
+    code: (s.code || "").trim()
+  }));
 
   db.pythonLessons.push({
     id: uid("py"),
     title,
-    slides: PY_DRAFT.slice(),
+    slides,
     createdAt: Date.now()
   });
 
-  saveDB(db);
+  try{
+    saveDB(db);
+  }catch(e){
+    showAlert("bad","فشل الحفظ: المتصفح امتلأ (LocalStorage). احذف ملفات كبيرة أو قلل البيانات.");
+    return;
+  }
+
   showAlert("ok","تم حفظ درس بايثون ✅");
-  $("#pyTitle").value = "";
+
+  if(titleEl) titleEl.value = "";
   resetDraftUI();
   route();
 }
