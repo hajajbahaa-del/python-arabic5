@@ -50,7 +50,6 @@
     }
     .brand b{font-size:16px}
     .brand span{font-size:12px; opacity:.9}
-
     .nav{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
 
     .btn{
@@ -126,7 +125,9 @@
       background:#fff;
     }
     textarea{min-height:120px; resize:vertical}
-    input:focus, textarea:focus, select:focus{border-color:#98a6ff; box-shadow: 0 0 0 4px rgba(13,57,255,.12)}
+    input:focus, textarea:focus, select:focus{
+      border-color:#98a6ff; box-shadow: 0 0 0 4px rgba(13,57,255,.12)
+    }
     .help{font-size:12px; color:var(--muted)}
     .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 720px){ .split{grid-template-columns:1fr} }
@@ -217,24 +218,25 @@
    Single-file Platform (LocalStorage)
    - Generation (fields) -> Tasks (courses) -> Lessons -> Documents
    - Admin CRUD
-   - Login + Save last lesson per user
+   - Login + Register (per device) + Save last lesson per user
 ============================================================================ */
 
-const LS_KEY = "btec_platform_v2";
-const SESSION_KEY = "btec_session_v2";
-const PROGRESS_KEY = "btec_progress_v2";
+const LS_KEY = "btec_platform_v3";
+const SESSION_KEY = "btec_session_v3";
+const PROGRESS_KEY = "btec_progress_v3";
+const DEVICE_KEY = "btec_device_v1";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
 const esc = (s="") => String(s)
   .replaceAll("&","&amp;").replaceAll("<","&lt;")
-  .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
   .replaceAll("'","&#039;");
 
 function uid(prefix="id"){
   return prefix + "_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
-
 function showAlert(type, msg){
   const box = $("#alertBox");
   box.className = "alert " + (type || "");
@@ -243,7 +245,6 @@ function showAlert(type, msg){
   box.classList.remove("hide");
 }
 function hideAlert(){ $("#alertBox").classList.add("hide"); }
-
 function go(hash){ location.hash = hash; }
 
 function getSession(){
@@ -256,6 +257,16 @@ function logout(){
   renderNav();
   showAlert("ok","تم تسجيل الخروج");
   go("#/");
+}
+
+/* ---------- Device identity (per browser) ---------- */
+function getDeviceId(){
+  let d = localStorage.getItem(DEVICE_KEY);
+  if(!d){
+    d = "dev_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+    localStorage.setItem(DEVICE_KEY, d);
+  }
+  return d;
 }
 
 /* ---------- Progress (last lesson) ---------- */
@@ -283,16 +294,14 @@ function getUserLastLesson(){
 function seedData(){
   return {
     users: [
-      { id:"u_admin", username:"admin", password:"admin12345", role:"admin", name:"Admin" },
-      { id:"u_student", username:"student", password:"1234", role:"student", name:"Student" }
+      // ✅ الأدمن فقط (لا نعرضه بأي مكان في الواجهة)
+      { id:"u_admin", username:"bahaa_hajaj", password:"bahaahajaj0775135361n", role:"admin", name:"Baha Admin", deviceId:"*" }
     ],
-    // الأجيال
     fields: [
       { id:"g_2008", name:"جيل 2008", desc:"مهام ومستندات خاصة بطلاب 2008" },
       { id:"g_2009", name:"جيل 2009", desc:"مهام ومستندات خاصة بطلاب 2009" },
       { id:"g_2010", name:"جيل 2010", desc:"مهام ومستندات خاصة بطلاب 2010" }
     ],
-    // المهام (تُستخدم مكان courses)
     courses: [
       { id:"t_2008_1", fieldId:"g_2008", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
       { id:"t_2009_1", fieldId:"g_2009", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
@@ -327,7 +336,7 @@ function loadDB(){
 }
 function saveDB(db){ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
 
-/* ---------- Derived helpers ---------- */
+/* ---------- Helpers ---------- */
 function dbFind(db, arrName, id){ return db[arrName].find(x => x.id === id); }
 function coursesByField(db, fieldId){ return db.courses.filter(c => c.fieldId === fieldId); }
 function lessonsByCourse(db, courseId){
@@ -335,6 +344,55 @@ function lessonsByCourse(db, courseId){
 }
 function docsByCourse(db, courseId){
   return db.docs.filter(d => d.courseId === courseId).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+}
+
+/* ---------- User auth: login/register per device ---------- */
+function normalizeU(u){ return (u||"").trim().toLowerCase(); }
+
+function findUserForDevice(db, username, deviceId){
+  const u = normalizeU(username);
+  return db.users.find(x =>
+    normalizeU(x.username) === u &&
+    (x.role === "admin" ? true : x.deviceId === deviceId)
+  );
+}
+
+function registerStudent(db, username, password, deviceId){
+  const u = (username||"").trim();
+  const p = (password||"").trim();
+
+  if(u.length < 3) return { ok:false, msg:"اسم المستخدم لازم يكون 3 أحرف أو أكثر." };
+  if(p.length < 4) return { ok:false, msg:"كلمة المرور لازم تكون 4 أحرف/أرقام أو أكثر." };
+
+  // لا نسمح بتسجيل طالب على اسم الأدمن
+  if(normalizeU(u) === "bahaa_hajaj") return { ok:false, msg:"هذا الاسم محجوز." };
+
+  // على نفس الجهاز: ممنوع تكرار نفس اليوزر
+  const existsSameDevice = db.users.find(x => x.role !== "admin" && x.deviceId === deviceId && normalizeU(x.username) === normalizeU(u));
+  if(existsSameDevice) return { ok:false, msg:"هذا المستخدم موجود على هذا الجهاز. جرّب تسجيل الدخول بدل إنشاء حساب." };
+
+  const newUser = {
+    id: uid("u"),
+    username: u,
+    password: p,
+    role: "student",
+    name: u,
+    deviceId
+  };
+  db.users.push(newUser);
+  saveDB(db);
+  return { ok:true, user:newUser };
+}
+
+function loginUser(db, username, password, deviceId){
+  const u = (username||"").trim();
+  const p = (password||"").trim();
+  const user = findUserForDevice(db, u, deviceId);
+
+  if(!user) return { ok:false, msg:"المستخدم غير موجود على هذا الجهاز. إذا أول مرة، اختر (إنشاء حساب جديد)." };
+  if(user.password !== p) return { ok:false, msg:"كلمة المرور غير صحيحة." };
+
+  return { ok:true, user };
 }
 
 /* ---------- Navigation render ---------- */
@@ -392,7 +450,7 @@ function renderHome(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">الأجيال</h1>
-          <div class="muted">اختر الجيل ثم افتح المهمة، وبعدها حمل ملفات المهمة أو اقرأ الدروس.</div>
+          <div class="muted">اختر الجيل ثم افتح المهمة، وبعدها حمل مستندات المهمة أو اقرأ الدروس.</div>
         </div>
         <div class="row">
           <span class="pill">2008</span><span class="pill">2009</span><span class="pill">2010</span>
@@ -406,7 +464,7 @@ function renderHome(){
             <button class="btn small" onclick="go('#/lesson/${lastLesson.id}')">متابعة</button>
           </div>
         ` : `
-          <div class="muted">سجّل دخول عشان نحفظ آخر درس وصلت له.</div>
+          <div class="muted">سجّل دخول بحسابك (على هذا الجهاز) عشان نحفظ آخر درس وصلت له.</div>
         `
       }
     </div>
@@ -415,7 +473,7 @@ function renderHome(){
       <div class="cardHeader">
         <div>
           <div class="h2">الدروس اليومية (آخر الدروس)</div>
-          <div class="muted">كل يوم أضف درس جديد من لوحة التحكم وسيظهر هنا.</div>
+          <div class="muted">كل يوم أضف درس جديد من لوحة التحكم (للأدمن).</div>
         </div>
       </div>
       <div class="list">
@@ -562,7 +620,6 @@ function renderLesson(lessonId){
   const lesson = dbFind(db, "lessons", lessonId);
   if(!lesson){ showAlert("bad","الدرس غير موجود"); return go("#/"); }
 
-  // حفظ التقدم للمستخدم
   setUserLastLesson(lessonId);
 
   const task = dbFind(db, "courses", lesson.courseId);
@@ -685,61 +742,89 @@ function doSearch(){
   `;
 }
 
+/* ---------- Login/Register page ---------- */
 function renderLogin(){
   const root = $("#page-login");
   root.classList.remove("hide");
+
+  const deviceId = getDeviceId();
+  const short = deviceId.split("_").slice(-1)[0].slice(-4);
+  const suggested = "student_" + short;
 
   root.innerHTML = `
     <div class="card" style="max-width:520px;margin:0 auto;">
       <div class="cardHeader">
         <div>
           <h1 class="h1">تسجيل الدخول</h1>
-          <div class="muted">بعد الدخول نحفظ آخر درس وصلت له.</div>
+          <div class="muted">
+            ملاحظة: <b>كل جهاز له حسابه الخاص</b>. إذا أول مرة عندك على هذا الجهاز، اختر "إنشاء حساب جديد"
+            وسجّل باسم مستخدم مختلف عن غيرك. الحساب ينحفظ على نفس الجهاز.
+          </div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
 
-      <form class="form" onsubmit="event.preventDefault(); doLogin();">
+      <form class="form" onsubmit="event.preventDefault(); doAuth();">
+        <label>
+          <input type="checkbox" id="isRegister" checked>
+          إنشاء حساب جديد (طالب) على هذا الجهاز
+        </label>
+
         <label>اسم المستخدم</label>
-        <input id="username" autocomplete="username" placeholder="admin أو student" required>
+        <input id="username" autocomplete="username" placeholder="مثال: ${esc(suggested)}" value="${esc(suggested)}" required>
 
         <label>كلمة المرور</label>
-        <input id="password" type="password" autocomplete="current-password" placeholder="admin12345 أو 1234" required>
+        <input id="password" type="password" autocomplete="current-password" placeholder="اكتب كلمة مرور" required>
 
-        <button class="btn" type="submit">دخول</button>
+        <button class="btn" type="submit">متابعة</button>
 
-        <div class="alert warn" style="margin-top:12px">
-          <div>
-            <b>حسابات تجريبية:</b><br>
-            Admin: <code>admin / admin12345</code><br>
-            Student: <code>student / 1234</code>
-          </div>
+        <div class="help">
+          إذا كان عندك حساب سابق على نفس الجهاز: أزل علامة "إنشاء حساب جديد" ثم سجّل دخول بنفس البيانات.
         </div>
       </form>
     </div>
   `;
 }
 
-function doLogin(){
+function doAuth(){
   const db = loadDB();
+  const deviceId = getDeviceId();
+
+  const isRegister = $("#isRegister").checked;
   const u = ($("#username").value || "").trim();
   const p = ($("#password").value || "").trim();
 
-  const user = db.users.find(x => x.username === u && x.password === p);
-  if(!user){
-    showAlert("bad","بيانات الدخول غير صحيحة");
+  // لو كان الأدمن: لازم يكون تسجيل دخول فقط (حتى ما ينشئ طالب بنفس الاسم)
+  if(normalizeU(u) === "bahaa_hajaj"){
+    const r = loginUser(db, u, p, deviceId);
+    if(!r.ok){ showAlert("bad", r.msg); return; }
+    setSession({ id:r.user.id, username:r.user.username, role:r.user.role, name:r.user.name });
+    showAlert("ok","تم تسجيل الدخول كأدمن ✅");
+    go("#/admin");
     return;
   }
-  setSession({ id:user.id, username:user.username, role:user.role, name:user.name });
-  showAlert("ok", `تم تسجيل الدخول ✅`);
-  go(user.role === "admin" ? "#/admin" : "#/");
+
+  if(isRegister){
+    const rr = registerStudent(db, u, p, deviceId);
+    if(!rr.ok){ showAlert("bad", rr.msg); return; }
+    setSession({ id:rr.user.id, username:rr.user.username, role:rr.user.role, name:rr.user.name });
+    showAlert("ok","تم إنشاء الحساب وتسجيل الدخول ✅");
+    go("#/");
+    return;
+  }
+
+  const r = loginUser(db, u, p, deviceId);
+  if(!r.ok){ showAlert("bad", r.msg); return; }
+  setSession({ id:r.user.id, username:r.user.username, role:r.user.role, name:r.user.name });
+  showAlert("ok","تم تسجيل الدخول ✅");
+  go("#/");
 }
 
 /* ---------- Admin Page ---------- */
 function requireAdmin(){
   const s = getSession();
   if(!s || s.role !== "admin"){
-    showAlert("bad","هذه الصفحة للأدمن فقط. سجل دخول كـ admin.");
+    showAlert("bad","هذه الصفحة للأدمن فقط.");
     go("#/login");
     return false;
   }
@@ -779,7 +864,7 @@ function renderAdmin(){
         <div class="cardHeader">
           <div>
             <div class="h2">إضافة جيل</div>
-            <div class="muted">مثال: جيل 2008</div>
+            <div class="muted">مثال: جيل 2011</div>
           </div>
         </div>
         <form class="form" onsubmit="event.preventDefault(); addField();">
@@ -946,6 +1031,7 @@ function resetAll(){
   if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(PROGRESS_KEY);
+  // ما نحذف DEVICE_KEY حتى يضل نفس الجهاز معروف
   showAlert("ok","تمت إعادة الضبط");
   route();
 }
