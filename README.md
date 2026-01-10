@@ -462,7 +462,7 @@ function renderHome(){
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <div class="h2">آخر دروس بايثون</div>
+          <div class="h2">تعلم دروس بايثون من تحت صفر (Python)</div>
           <div class="muted">تضاف من لوحة التحكم (برسنتيشن).</div>
         </div>
       </div>
