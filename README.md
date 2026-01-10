@@ -226,7 +226,8 @@ const SESSION_KEY = "btec_session_v4";
 const DEVICE_KEY = "btec_device_v1";
 const PROGRESS_KEY = "btec_progress_v4";
 
-// ✅✅ جديد: رابط ملف الدروس على نفس الموقع (ارفع btec-backup.json بجانب index.html)
+/* ✅✅✅ جديد: رابط ملف الدروس/النسخة الاحتياطية على نفس الموقع
+   ارفع btec-backup.json بجانب index.html */
 const BACKUP_FILE_URL = "./btec-backup.json";
 
 /* ---------- Utilities ---------- */
@@ -447,15 +448,15 @@ function renderHome(){
       ${lastHtml}
     </div>
 
-    <!-- ✅✅✅ جديد: صندوق تحميل/استيراد ملف الدروس في الرئيسية -->
+    <!-- ✅✅✅ الجديد: ملف الدروس في الرئيسية + ملاحظة -->
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <div class="h2">📌 لإظهار الدروس على أي جهاز</div>
+          <div class="h2">📌 مهم: لإظهار الدروس على أي جهاز</div>
           <div class="muted">
-            هذه المنصة تعمل بدون سيرفر، لذلك الدروس لا تظهر تلقائيًا على الأجهزة الجديدة.
+            المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.
             <br>
-            <b>عشان تظهر الدروس: حمّل ملف الدروس ثم استورده مرة واحدة فقط.</b>
+            <b>إذا ما ظهرت الدروس عندك:</b> اضغط استيراد (تلقائي أو يدوي) مرة واحدة.
           </div>
         </div>
       </div>
@@ -463,15 +464,16 @@ function renderHome(){
       <div class="row">
         <a class="btn ok" href="${BACKUP_FILE_URL}" download>تحميل ملف الدروس</a>
 
+        <button class="btn" type="button" onclick="importFromURL()">استيراد تلقائي من الموقع</button>
+
         <label class="btn ghost" style="cursor:pointer;">
-          استيراد ملف الدروس
-          <input type="file" accept="application/json" style="display:none"
-                 onchange="importDB(this.files[0])">
+          استيراد يدوي (من الجهاز)
+          <input type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
         </label>
       </div>
 
       <div class="help" style="margin-top:8px">
-        إذا زر التحميل ما اشتغل: الأدمن لازم يرفع ملف <b>btec-backup.json</b> على الموقع (نفس مكان index.html).
+        ملاحظة للأدمن: لازم ترفع ملف <b>btec-backup.json</b> بجانب <b>index.html</b> على الاستضافة.
       </div>
     </div>
 
@@ -536,11 +538,814 @@ function renderHome(){
   });
 }
 
-/* باقي الكود كما هو من نسختك (لم يتم حذفه) */
-/* ---------- (مهم) لأنك أرسلت كود قديم طويل، أبقيت الجزء المهم للتعديل فقط ---------- */
+function renderTask(taskId){
+  const db = loadDB();
+  const task = dbFind(db, "tasks", taskId);
+  if(!task){ showAlert("bad","المهمة غير موجودة"); return go("#/"); }
+
+  const gen = dbFind(db, "generations", task.genId);
+  const docs = docsByTask(db, taskId);
+
+  setUserLast("task", taskId);
+
+  const root = $("#page-task");
+  root.classList.remove("hide");
+
+  root.innerHTML = `
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">${esc(task.title)}</h1>
+          <div class="muted">الجيل: <b>${esc(gen?.name||"-")}</b></div>
+          <div class="muted">${esc(task.description||"")}</div>
+        </div>
+        <div class="row">
+          <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
+          <span class="pill">${docs.length} مستند</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card soft">
+          <div class="cardHeader">
+            <div>
+              <div class="h2">مستندات المهمة</div>
+              <div class="muted">تنزيل مستندات هذه المهمة.</div>
+            </div>
+          </div>
+
+          <div class="list">
+            ${
+              docs.length ? docs.map(d=>`
+                <div class="item">
+                  <div>
+                    <div class="title">${esc(d.displayName)}</div>
+                    <div class="sub">${esc(d.filename)} • ${Math.round((d.size||0)/1024)} KB</div>
+                  </div>
+                  <div class="meta">
+                    <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
+                  </div>
+                </div>
+              `).join("") : `<div class="muted">لا يوجد مستندات بعد.</div>`
+            }
+          </div>
+
+          <div class="alert warn" style="margin-top:12px">
+            <div><b>تنبيه:</b> المستندات تُحفظ محليًا داخل المتصفح (LocalStorage).</div>
+            <button class="btn small dark" onclick="hideAlert()">حسنًا</button>
+          </div>
+        </div>
+
+        <div class="card soft">
+          <div class="cardHeader">
+            <div>
+              <div class="h2">ملاحظات المهمة</div>
+              <div class="muted">اكتب وصف المهمة من لوحة التحكم، وسيظهر هنا.</div>
+            </div>
+          </div>
+          <div class="muted">${esc(task.description || "لا يوجد وصف بعد.")}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- Python pages (presentation) ---------- */
+function renderPython(){
+  const db = loadDB();
+  const root = $("#page-python");
+  root.classList.remove("hide");
+
+  const lessons = pythonLessonsSorted(db);
+
+  root.innerHTML = `
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">دروس بايثون</h1>
+          <div class="muted">دروس على شكل برسنتيشن (شرائح) تضاف من لوحة التحكم.</div>
+        </div>
+        <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
+      </div>
+
+      <div class="list">
+        ${
+          lessons.length ? lessons.map(l=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(l.title)}</div>
+                <div class="sub">${new Date(l.createdAt||Date.now()).toLocaleString("ar")}</div>
+              </div>
+              <div class="meta">
+                <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+              </div>
+            </div>
+          `).join("") : `<div class="muted">لا يوجد دروس بعد. (أضفها من لوحة التحكم)</div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function renderPythonLesson(id){
+  const db = loadDB();
+  const lesson = dbFind(db, "pythonLessons", id);
+  if(!lesson){ showAlert("bad","درس بايثون غير موجود"); return go("#/python"); }
+
+  setUserLast("python", id);
+
+  const root = $("#page-python-lesson");
+  root.classList.remove("hide");
+
+  root.innerHTML = `
+    <div class="lessonWrap">
+      <div class="lessonHeader">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div style="font-weight:900;opacity:.95">بسم الله الرحمن الرحيم</div>
+            <div class="lessonTitle">${esc(lesson.title)}</div>
+          </div>
+          <div class="row">
+            <button class="btn ghost" onclick="go('#/python')">رجوع</button>
+            <button class="btn ghost" onclick="go('#/')">الرئيسية</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lessonBody">
+        ${
+          (lesson.slides||[]).length ? (lesson.slides||[]).map((s,idx)=>`
+            <div class="slide">
+              <h3>${idx+1}. ${esc(s.title || "شريحة")}</h3>
+              ${
+                (s.bullets||[]).length ? `<ul>${s.bullets.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>` : `<div class="muted">—</div>`
+              }
+              ${
+                s.code ? `<pre>${esc(s.code)}</pre>` : ``
+              }
+            </div>
+          `).join("") : `<div class="muted">لا يوجد شرائح بعد.</div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+/* ---------- Search ---------- */
+function renderSearch(){
+  const root = $("#page-search");
+  root.classList.remove("hide");
+
+  root.innerHTML = `
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">بحث</h1>
+          <div class="muted">ابحث داخل الأجيال/المهمات/المستندات/دروس بايثون.</div>
+        </div>
+        <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
+      </div>
+
+      <div class="form">
+        <label>اكتب كلمة البحث</label>
+        <input id="q" placeholder="مثال: مهمة قواعد / متغيرات / loops ..." oninput="doSearch()">
+      </div>
+
+      <div id="searchResults" class="grid" style="margin-top:14px"></div>
+    </div>
+  `;
+
+  doSearch();
+}
+
+function doSearch(){
+  const db = loadDB();
+  const q = ($("#q")?.value || "").trim().toLowerCase();
+  const out = $("#searchResults");
+  if(!out) return;
+
+  const match = (s)=> (s||"").toLowerCase().includes(q);
+  if(!q){
+    out.innerHTML = `<div class="card soft" style="grid-column:1/-1"><div class="muted">اكتب كلمة للبحث…</div></div>`;
+    return;
+  }
+
+  const gens = db.generations.filter(g=> match(g.name) || match(g.desc));
+  const tasks = db.tasks.filter(t=> match(t.title) || match(t.description));
+  const docs = db.taskDocs.filter(d=> match(d.displayName) || match(d.filename));
+  const py = db.pythonLessons.filter(l=> match(l.title) || (l.slides||[]).some(s=> match(s.title) || (s.bullets||[]).some(b=>match(b)) || match(s.code)));
+
+  const mk = (title, items) => `
+    <div class="card soft">
+      <div class="cardHeader">
+        <div class="h2">${title}</div>
+        <span class="pill">${items.length}</span>
+      </div>
+      <div class="list">${items.length ? items.join("") : `<div class="muted">لا نتائج</div>`}</div>
+    </div>
+  `;
+
+  out.innerHTML = `
+    ${mk("الأجيال", gens.map(g=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(g.name)}</div>
+          <div class="sub">${esc(g.desc||"")}</div>
+        </div>
+        <div class="meta"><span class="pill">جيل</span></div>
+      </div>
+    `))}
+    ${mk("المهمات", tasks.map(t=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(t.title)}</div>
+          <div class="sub">${esc(t.description||"")}</div>
+        </div>
+        <div class="meta">
+          <button class="btn small" onclick="go('#/task/${t.id}')">فتح</button>
+        </div>
+      </div>
+    `))}
+    ${mk("المستندات", docs.map(d=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(d.displayName)}</div>
+          <div class="sub">${esc(d.filename)}</div>
+        </div>
+        <div class="meta">
+          <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
+        </div>
+      </div>
+    `))}
+    ${mk("دروس بايثون", py.map(l=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(l.title)}</div>
+          <div class="sub">درس برسنتيشن</div>
+        </div>
+        <div class="meta">
+          <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+        </div>
+      </div>
+    `))}
+  `;
+}
+
+/* ---------- Login/Register ---------- */
+function renderLogin(){
+  const root = $("#page-login");
+  root.classList.remove("hide");
+
+  const deviceId = getDeviceId();
+  const short = deviceId.split("_").slice(-1)[0].slice(-4);
+  const suggested = "student_" + short;
+
+  root.innerHTML = `
+    <div class="card" style="max-width:520px;margin:0 auto;">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">تسجيل الدخول</h1>
+          <div class="muted">
+            ملاحظة: كل جهاز له حسابه الخاص. أنشئ حساب طالب باسم مختلف، وسيبقى محفوظًا على نفس الجهاز.
+          </div>
+        </div>
+        <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
+      </div>
+
+      <form class="form" onsubmit="event.preventDefault(); doAuth();">
+        <label>
+          <input type="checkbox" id="isRegister" checked>
+          إنشاء حساب جديد (طالب) على هذا الجهاز
+        </label>
+
+        <label>اسم المستخدم</label>
+        <input id="username" autocomplete="username" placeholder="مثال: ${esc(suggested)}" value="${esc(suggested)}" required>
+
+        <label>كلمة المرور</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="اكتب كلمة مرور" required>
+
+        <button class="btn" type="submit">متابعة</button>
+
+        <div class="help">
+          إذا عندك حساب سابق على نفس الجهاز: أزل علامة "إنشاء حساب جديد" ثم ادخل نفس البيانات.
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+function doAuth(){
+  const db = loadDB();
+  const deviceId = getDeviceId();
+
+  const isRegister = $("#isRegister").checked;
+  const u = ($("#username").value || "").trim();
+  const p = ($("#password").value || "").trim();
+
+  if(normalizeU(u) === "bahaa_hajaj"){
+    const r = loginUser(db, u, p, deviceId);
+    if(!r.ok){ showAlert("bad", r.msg); return; }
+    setSession({ id:r.user.id, username:r.user.username, role:r.user.role, name:r.user.name });
+    showAlert("ok","تم تسجيل الدخول كأدمن ✅");
+    go("#/admin");
+    return;
+  }
+
+  if(isRegister){
+    const rr = registerStudent(db, u, p, deviceId);
+    if(!rr.ok){ showAlert("bad", rr.msg); return; }
+    setSession({ id:rr.user.id, username:rr.user.username, role:rr.user.role, name:rr.user.name });
+    showAlert("ok","تم إنشاء الحساب وتسجيل الدخول ✅");
+    go("#/");
+    return;
+  }
+
+  const r = loginUser(db, u, p, deviceId);
+  if(!r.ok){ showAlert("bad", r.msg); return; }
+  setSession({ id:r.user.id, username:r.user.username, role:r.user.role, name:r.user.name });
+  showAlert("ok","تم تسجيل الدخول ✅");
+  go("#/");
+}
+
+/* ---------- Admin ---------- */
+function requireAdmin(){
+  const s = getSession();
+  if(!s || s.role !== "admin"){
+    showAlert("bad","هذه الصفحة للأدمن فقط.");
+    go("#/login");
+    return false;
+  }
+  return true;
+}
+
+function renderAdmin(){
+  if(!requireAdmin()) return;
+  const db = loadDB();
+  const root = $("#page-admin");
+  root.classList.remove("hide");
+
+  root.innerHTML = `
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">لوحة التحكم</h1>
+          <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
+        </div>
+
+        <!-- ✅✅ تم إضافة تصدير/استيراد هنا -->
+        <div class="row">
+          <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
+
+          <button class="btn ok" onclick="exportDB()">تصدير البيانات</button>
+
+          <label class="btn ghost" style="cursor:pointer;">
+            استيراد البيانات
+            <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
+          </label>
+
+          <button class="btn danger" onclick="resetAll()">إعادة ضبط البيانات</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        ${adminStatsCard("الأجيال", db.generations.length)}
+        ${adminStatsCard("المهمات", db.tasks.length)}
+        ${adminStatsCard("مستندات المهمات", db.taskDocs.length)}
+        ${adminStatsCard("دروس بايثون", db.pythonLessons.length)}
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:14px">
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="h2">إضافة جيل</div>
+            <div class="muted">أنت تختار اسم الجيل.</div>
+          </div>
+        </div>
+        <form class="form" onsubmit="event.preventDefault(); addGen();">
+          <label>اسم الجيل</label>
+          <input id="genName" placeholder="مثال: جيل 2011" required>
+          <label>وصف مختصر</label>
+          <input id="genDesc" placeholder="اختياري">
+          <button class="btn" type="submit">إضافة</button>
+        </form>
+
+        <div style="margin-top:12px" class="list">
+          ${db.generations.map(g=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(g.name)}</div>
+                <div class="sub">${esc(g.desc||"")}</div>
+              </div>
+              <div class="meta">
+                <button class="btn small danger" onclick="delGen('${g.id}')">حذف</button>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="h2">إضافة مهمة داخل جيل</div>
+            <div class="muted">أنت تكتب اسم المهمة بنفسك.</div>
+          </div>
+        </div>
+        <form class="form" onsubmit="event.preventDefault(); addTask();">
+          <label>اختر الجيل</label>
+          <select id="taskGenId" required>
+            ${db.generations.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("")}
+          </select>
+
+          <label>اسم المهمة</label>
+          <input id="taskTitle" placeholder="مثال: مهمة قواعد البيانات" required>
+
+          <label>وصف المهمة</label>
+          <input id="taskDesc" placeholder="اختياري">
+
+          <button class="btn" type="submit">إضافة</button>
+        </form>
+
+        <div style="margin-top:12px" class="list">
+          ${db.tasks.slice().reverse().map(t=>{
+            const g = dbFind(db,"generations",t.genId);
+            return `
+              <div class="item">
+                <div>
+                  <div class="title">${esc(t.title)}</div>
+                  <div class="sub">${esc(g?.name||"-")} • ${esc(t.description||"")}</div>
+                </div>
+                <div class="meta">
+                  <button class="btn small" onclick="go('#/task/${t.id}')">فتح</button>
+                  <button class="btn small danger" onclick="delTask('${t.id}')">حذف</button>
+                </div>
+              </div>
+            `;
+          }).join("") || `<div class="muted">لا يوجد مهمات بعد.</div>`}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="h2">رفع مستند لمهمة</div>
+            <div class="muted">اختر الجيل ثم المهمة، واكتب اسم المستند.</div>
+          </div>
+        </div>
+
+        <form class="form" onsubmit="event.preventDefault(); addTaskDoc();">
+          <label>اختر الجيل</label>
+          <select id="docGenId" onchange="refreshDocTasks()" required>
+            ${db.generations.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("")}
+          </select>
+
+          <label>اختر المهمة</label>
+          <select id="docTaskId" required></select>
+
+          <label>اسم المستند (يظهر للطلاب)</label>
+          <input id="docDisplayName" placeholder="مثال: حل المهمة PDF" required>
+
+          <label>اختر الملف</label>
+          <input id="docFile" type="file" required>
+
+          <button class="btn" type="submit">رفع</button>
+          <div class="help">ملاحظة: التخزين محلي (LocalStorage) مناسب للملفات الصغيرة.</div>
+        </form>
+
+        <div style="margin-top:12px" class="list">
+          ${db.taskDocs.slice().reverse().slice(0,10).map(d=>{
+            const t = dbFind(db,"tasks",d.taskId);
+            const g = t ? dbFind(db,"generations",t.genId) : null;
+            return `
+              <div class="item">
+                <div>
+                  <div class="title">${esc(d.displayName)}</div>
+                  <div class="sub">${esc(g?.name||"-")} • ${esc(t?.title||"-")} • ${esc(d.filename)}</div>
+                </div>
+                <div class="meta">
+                  <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
+                  <button class="btn small danger" onclick="delTaskDoc('${d.id}')">حذف</button>
+                </div>
+              </div>
+            `;
+          }).join("") || `<div class="muted">لا يوجد مستندات بعد.</div>`}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="h2">إضافة درس بايثون (برسنتيشن)</div>
+            <div class="muted">تكتب محتوى مرتب، والطلاب يفتحوه كشرائح.</div>
+          </div>
+        </div>
+
+        <form class="form" onsubmit="event.preventDefault(); return false;">
+          <label>عنوان الدرس</label>
+          <input id="pyTitle" placeholder="مثال: المتغيرات في بايثون" required>
+
+          <div class="split">
+            <div>
+              <label>عنوان الشريحة</label>
+              <input id="pySlideTitle" placeholder="مثال: ما هو المتغير؟">
+            </div>
+            <div>
+              <label>كود (اختياري)</label>
+              <input id="pySlideCodeOneLine" placeholder='مثال: name = "Ali"'>
+            </div>
+          </div>
+
+          <label>نقاط الشريحة (كل سطر نقطة)</label>
+          <textarea id="pySlideBullets" placeholder="اكتب نقاط...\nكل سطر = نقطة"></textarea>
+
+          <div class="row">
+            <button class="btn dark" type="button" onclick="addSlideToDraft()">+ إضافة الشريحة إلى المسودة</button>
+            <span class="pill" id="draftCount">0 شريحة</span>
+            <button class="btn" type="button" onclick="addPythonLesson()">حفظ الدرس</button>
+          </div>
+
+          <div class="help">نصيحة: اعمل 5-10 شرائح للدرس، وبعدها اضغط حفظ.</div>
+
+          <div id="draftPreview" class="list" style="margin-top:10px"></div>
+        </form>
+
+        <div style="margin-top:12px" class="list">
+          ${pythonLessonsSorted(db).slice(0,10).map(l=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(l.title)}</div>
+                <div class="sub">${(l.slides||[]).length} شريحة • ${new Date(l.createdAt||Date.now()).toLocaleDateString("ar")}</div>
+              </div>
+              <div class="meta">
+                <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+                <button class="btn small danger" onclick="delPythonLesson('${l.id}')">حذف</button>
+              </div>
+            </div>
+          `).join("") || `<div class="muted">لا يوجد دروس بايثون بعد.</div>`}
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  refreshDocTasks();
+  resetDraftUI();
+}
+
+function adminStatsCard(title, num){
+  return `
+    <div class="card soft">
+      <div class="h2">${esc(title)}</div>
+      <div style="font-size:34px;font-weight:1000;color:var(--primary);margin-top:6px">${num}</div>
+    </div>
+  `;
+}
+
+/* ---------- Admin actions ---------- */
+function resetAll(){
+  if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(PROGRESS_KEY);
+  showAlert("ok","تمت إعادة الضبط");
+  route();
+}
+
+function addGen(){
+  const db = loadDB();
+  const name = ($("#genName").value||"").trim();
+  const desc = ($("#genDesc").value||"").trim();
+  if(!name) return;
+
+  if(db.generations.some(g => (g.name||"").toLowerCase() === name.toLowerCase())){
+    showAlert("bad","اسم الجيل موجود مسبقًا");
+    return;
+  }
+  db.generations.push({ id: uid("g"), name, desc });
+  saveDB(db);
+  showAlert("ok","تم إضافة الجيل ✅");
+  route();
+}
+
+function delGen(id){
+  if(!confirm("حذف الجيل سيحذف المهمات والمستندات التابعة له. متابعة؟")) return;
+  const db = loadDB();
+  const tasks = db.tasks.filter(t=>t.genId===id).map(t=>t.id);
+  db.taskDocs = db.taskDocs.filter(d => !tasks.includes(d.taskId));
+  db.tasks = db.tasks.filter(t => t.genId !== id);
+  db.generations = db.generations.filter(g => g.id !== id);
+  saveDB(db);
+  showAlert("ok","تم حذف الجيل ✅");
+  route();
+}
+
+function addTask(){
+  const db = loadDB();
+  const genId = $("#taskGenId").value;
+  const title = ($("#taskTitle").value||"").trim();
+  const description = ($("#taskDesc").value||"").trim();
+  if(!title) return;
+
+  db.tasks.push({ id: uid("t"), genId, title, description });
+  saveDB(db);
+  showAlert("ok","تم إضافة المهمة ✅");
+  route();
+}
+
+function delTask(id){
+  if(!confirm("حذف المهمة سيحذف المستندات التابعة لها. متابعة؟")) return;
+  const db = loadDB();
+  db.taskDocs = db.taskDocs.filter(d => d.taskId !== id);
+  db.tasks = db.tasks.filter(t => t.id !== id);
+  saveDB(db);
+  showAlert("ok","تم حذف المهمة ✅");
+  route();
+}
+
+function refreshDocTasks(){
+  const db = loadDB();
+  const genId = $("#docGenId")?.value;
+  const sel = $("#docTaskId");
+  if(!sel) return;
+
+  const tasks = db.tasks.filter(t=>t.genId === genId);
+  sel.innerHTML = tasks.length
+    ? tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join("")
+    : `<option value="">لا يوجد مهمات لهذا الجيل</option>`;
+}
+
+function addTaskDoc(){
+  const db = loadDB();
+  const taskId = $("#docTaskId").value;
+  const displayName = ($("#docDisplayName").value||"").trim();
+  const fileInput = $("#docFile");
+  const file = fileInput.files?.[0];
+
+  if(!taskId){ showAlert("bad","اختر مهمة صحيحة"); return; }
+  if(!displayName){ showAlert("bad","اكتب اسم المستند"); return; }
+  if(!file){ showAlert("bad","اختر ملفًا"); return; }
+
+  if(file.size > 3 * 1024 * 1024){
+    if(!confirm("الملف أكبر من 3MB وقد لا يُحفظ. متابعة؟")) return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    db.taskDocs.push({
+      id: uid("doc"),
+      taskId,
+      displayName,
+      filename: file.name,
+      mime: file.type || "application/octet-stream",
+      size: file.size,
+      dataUrl,
+      createdAt: Date.now()
+    });
+
+    try{
+      saveDB(db);
+      showAlert("ok","تم رفع المستند ✅");
+      route();
+    }catch(e){
+      showAlert("bad","فشل الحفظ: LocalStorage امتلأ. جرّب ملف أصغر.");
+    }
+  };
+  reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
+  reader.readAsDataURL(file);
+}
+
+function delTaskDoc(id){
+  if(!confirm("حذف المستند؟")) return;
+  const db = loadDB();
+  db.taskDocs = db.taskDocs.filter(d => d.id !== id);
+  saveDB(db);
+  showAlert("ok","تم حذف المستند ✅");
+  route();
+}
+
+function downloadTaskDoc(id){
+  const db = loadDB();
+  const doc = dbFind(db, "taskDocs", id);
+  if(!doc){ showAlert("bad","المستند غير موجود"); return; }
+  const a = document.createElement("a");
+  a.href = doc.dataUrl;
+  a.download = doc.filename || "file";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+let PY_DRAFT = [];
+
+function resetDraftUI(){
+  PY_DRAFT = [];
+  const cnt = $("#draftCount");
+  const prev = $("#draftPreview");
+  if(cnt) cnt.textContent = "0 شريحة";
+  if(prev) prev.innerHTML = "";
+}
+
+function addSlideToDraft(){
+  const title = ($("#pySlideTitle").value||"").trim();
+  const bulletsText = ($("#pySlideBullets").value||"").trim();
+  const code = ($("#pySlideCodeOneLine").value||"").trim();
+
+  if(!title){ showAlert("bad","اكتب عنوان الشريحة"); return; }
+
+  const bullets = bulletsText
+    ? bulletsText.split("\n").map(x=>x.trim()).filter(Boolean)
+    : [];
+
+  PY_DRAFT.push({ title, bullets, code });
+
+  $("#pySlideTitle").value = "";
+  $("#pySlideBullets").value = "";
+  $("#pySlideCodeOneLine").value = "";
+
+  renderDraftPreview();
+}
+
+function renderDraftPreview(){
+  const cnt = $("#draftCount");
+  const prev = $("#draftPreview");
+  if(cnt) cnt.textContent = `${PY_DRAFT.length} شريحة`;
+  if(!prev) return;
+
+  prev.innerHTML = PY_DRAFT.map((s,idx)=>`
+    <div class="item">
+      <div>
+        <div class="title">${idx+1}. ${esc(s.title)}</div>
+        <div class="sub">${(s.bullets||[]).length} نقاط ${s.code ? "• مع كود" : ""}</div>
+      </div>
+      <div class="meta">
+        <button class="btn small danger" type="button" onclick="removeDraftSlide(${idx})">حذف</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function removeDraftSlide(i){
+  PY_DRAFT.splice(i,1);
+  renderDraftPreview();
+}
+
+function addPythonLesson(){
+  const db = loadDB();
+
+  const titleEl = $("#pyTitle");
+  const title = (titleEl?.value || "").trim();
+
+  if(!title){
+    showAlert("bad","اكتب عنوان الدرس");
+    return;
+  }
+
+  if(!Array.isArray(PY_DRAFT) || PY_DRAFT.length === 0){
+    showAlert("bad","لازم تضيف على الأقل شريحة واحدة (اضغط + إضافة الشريحة)");
+    return;
+  }
+
+  const slides = PY_DRAFT.map(s => ({
+    title: (s.title || "").trim() || "شريحة",
+    bullets: Array.isArray(s.bullets) ? s.bullets.map(x=>String(x).trim()).filter(Boolean) : [],
+    code: (s.code || "").trim()
+  }));
+
+  db.pythonLessons.push({
+    id: uid("py"),
+    title,
+    slides,
+    createdAt: Date.now()
+  });
+
+  try{
+    saveDB(db);
+  }catch(e){
+    showAlert("bad","فشل الحفظ: المتصفح امتلأ (LocalStorage). احذف ملفات كبيرة أو قلل البيانات.");
+    return;
+  }
+
+  showAlert("ok","تم حفظ درس بايثون ✅");
+
+  if(titleEl) titleEl.value = "";
+  resetDraftUI();
+  route();
+}
+
+function delPythonLesson(id){
+  if(!confirm("حذف درس بايثون؟")) return;
+  const db = loadDB();
+  db.pythonLessons = db.pythonLessons.filter(l => l.id !== id);
+  saveDB(db);
+  showAlert("ok","تم حذف الدرس ✅");
+  route();
+}
 
 /* ============================================================================
-   ✅✅✅ الاستيراد والتصدير (موجودة عندك في القديم)
+   ✅✅✅ التعديل: تصدير/استيراد قاعدة البيانات بدون سيرفر
 ============================================================================ */
 
 function exportDB(){
@@ -579,6 +1384,29 @@ function importDB(file){
   };
   reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
   reader.readAsText(file, "utf-8");
+}
+
+/* ✅✅✅ جديد: استيراد تلقائي من ملف موجود على نفس الموقع بدون اختيار ملف */
+async function importFromURL(){
+  try{
+    if(!confirm("سيتم استيراد البيانات من الموقع واستبدال بيانات هذا الجهاز. متابعة؟")) return;
+
+    const res = await fetch(BACKUP_FILE_URL, { cache: "no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+
+    const data = await res.json();
+
+    if(!data || !data.users || !data.generations || !data.tasks || !data.taskDocs || !data.pythonLessons){
+      showAlert("bad","ملف الموقع غير صالح أو ناقص بيانات.");
+      return;
+    }
+
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    showAlert("ok","تم الاستيراد تلقائيًا من الموقع ✅");
+    route();
+  }catch(e){
+    showAlert("bad","فشل الاستيراد التلقائي. تأكد أن ملف btec-backup.json مرفوع بجانب index.html");
+  }
 }
 
 /* ---------- Boot ---------- */
