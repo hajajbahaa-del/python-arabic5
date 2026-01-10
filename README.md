@@ -3,13 +3,12 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>منصة BTEC - مهندس بهاء حجيج</title>
+  <title>BTEC - منصة مهندس بهاء</title>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
 
     :root{
-      --bg:#0b1020;
       --card:#ffffff;
       --text:#101828;
       --muted:#667085;
@@ -17,9 +16,6 @@
       --primary2:#000000;
       --line:#e6e9f5;
       --soft:#f5f7ff;
-      --ok:#12b76a;
-      --bad:#f04438;
-      --warn:#f79009;
       --shadow: 0 18px 45px rgba(0,0,0,.22);
       --shadow2: 0 10px 25px rgba(0,0,0,.18);
       --r:16px;
@@ -50,8 +46,8 @@
     }
     .brand b{font-size:16px}
     .brand span{font-size:12px; opacity:.9}
-    .nav{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
 
+    .nav{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
     .btn{
       border:0; cursor:pointer; font-family:inherit;
       padding:10px 12px; border-radius:12px;
@@ -69,6 +65,7 @@
     .btn.ok{background: #d1fadf; color:#027a48}
     .btn.dark{background:#101828; color:#fff}
     .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
+    .btn.link{background:transparent;color:var(--primary);text-decoration:underline;padding:0;border-radius:0}
 
     /* layout */
     .wrap{max-width:1100px; margin:18px auto; padding:0 14px}
@@ -125,37 +122,10 @@
       background:#fff;
     }
     textarea{min-height:120px; resize:vertical}
-    input:focus, textarea:focus, select:focus{
-      border-color:#98a6ff; box-shadow: 0 0 0 4px rgba(13,57,255,.12)
-    }
+    input:focus, textarea:focus, select:focus{border-color:#98a6ff; box-shadow: 0 0 0 4px rgba(13,57,255,.12)}
     .help{font-size:12px; color:var(--muted)}
     .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 720px){ .split{grid-template-columns:1fr} }
-
-    /* lesson page */
-    .lessonWrap{
-      background:#fff; color:#111;
-      border-radius: 18px; overflow:hidden;
-      box-shadow: var(--shadow);
-    }
-    .lessonHeader{
-      background: linear-gradient(135deg, var(--primary) 0%, #000 100%);
-      color:#fff;
-      padding:20px;
-    }
-    .bismillah{font-weight:900; font-size:18px; opacity:.95}
-    .lessonTitle{margin:8px 0 0; font-size:26px; font-weight:1000}
-    .lessonBody{padding:18px; line-height:1.95}
-    .lessonBody pre{
-      background:#111827; color:#d1fae5;
-      padding:12px; border-radius:14px;
-      overflow:auto; direction:ltr; text-align:left;
-    }
-    .lessonBody code{
-      background:#111827; color:#d1fae5;
-      padding:2px 6px; border-radius:8px;
-      direction:ltr;
-    }
 
     /* alerts */
     .alert{
@@ -169,7 +139,40 @@
     .alert.warn{border-color:#fedf89; background:#fffaeb}
     .hide{display:none !important}
 
-    /* footer */
+    /* presentation lesson */
+    .lessonWrap{
+      background:#fff; color:#111;
+      border-radius: 18px; overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    .lessonHeader{
+      background: linear-gradient(135deg, var(--primary) 0%, #000 100%);
+      color:#fff;
+      padding:20px;
+    }
+    .lessonTitle{margin:8px 0 0; font-size:26px; font-weight:1000}
+    .lessonBody{padding:18px; line-height:1.95}
+    .slide{
+      border:1px solid var(--line);
+      background:#fbfcff;
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .slide h3{margin:0 0 8px;color:var(--primary)}
+    .slide ul{margin:0; padding-right:18px}
+    .slide pre{
+      background:#111827; color:#d1fae5;
+      padding:12px; border-radius:14px;
+      overflow:auto; direction:ltr; text-align:left;
+      margin:10px 0 0;
+    }
+    .slide code{
+      background:#111827; color:#d1fae5;
+      padding:2px 6px; border-radius:8px;
+      direction:ltr;
+    }
+
     .footer{
       margin:20px 0 30px;
       text-align:center;
@@ -185,11 +188,12 @@
     <div class="inner">
       <a class="brand" href="#/">
         <b>(BTEC) منصة مهندس بهاء حجيج</b>
-        <span>أجيال 2008 / 2009 / 2010 • مهام + مستندات + دروس يومية</span>
+        <span>أجيال + مهمات + مستندات • ودروس Python برسنتيشن</span>
       </a>
 
       <div class="nav">
         <button class="btn ghost" onclick="go('#/')">الرئيسية</button>
+        <button class="btn ghost" onclick="go('#/python')">دروس بايثون</button>
         <button class="btn ghost" onclick="go('#/search')">بحث</button>
         <button class="btn ghost" onclick="go('#/login')" id="loginBtn">دخول</button>
         <button class="btn ghost hide" onclick="go('#/admin')" id="adminBtn">لوحة التحكم</button>
@@ -202,8 +206,11 @@
     <div id="alertBox" class="alert hide"></div>
 
     <div id="page-home" class="grid hide"></div>
-    <div id="page-course" class="hide"></div>
-    <div id="page-lesson" class="hide"></div>
+    <div id="page-task" class="hide"></div>
+
+    <div id="page-python" class="hide"></div>
+    <div id="page-python-lesson" class="hide"></div>
+
     <div id="page-search" class="hide"></div>
     <div id="page-login" class="hide"></div>
     <div id="page-admin" class="hide"></div>
@@ -216,15 +223,17 @@
 <script>
 /* ============================================================================
    Single-file Platform (LocalStorage)
-   - Generation (fields) -> Tasks (courses) -> Lessons -> Documents
-   - Admin CRUD
-   - Login + Register (per device) + Save last lesson per user
+   - Generations -> Tasks -> Task Documents
+   - Python Lessons (Presentation style)
+   - Admin controls naming + adding
+   - Login/Register per device
+   - Save last visited content per user
 ============================================================================ */
 
-const LS_KEY = "btec_platform_v3";
-const SESSION_KEY = "btec_session_v3";
-const PROGRESS_KEY = "btec_progress_v3";
+const LS_KEY = "btec_platform_v4";
+const SESSION_KEY = "btec_session_v4";
 const DEVICE_KEY = "btec_device_v1";
+const PROGRESS_KEY = "btec_progress_v4";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
@@ -237,6 +246,7 @@ const esc = (s="") => String(s)
 function uid(prefix="id"){
   return prefix + "_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
+
 function showAlert(type, msg){
   const box = $("#alertBox");
   box.className = "alert " + (type || "");
@@ -247,6 +257,7 @@ function showAlert(type, msg){
 function hideAlert(){ $("#alertBox").classList.add("hide"); }
 function go(hash){ location.hash = hash; }
 
+/* ---------- Session ---------- */
 function getSession(){
   try{ return JSON.parse(localStorage.getItem(SESSION_KEY) || "null"); }
   catch{ return null; }
@@ -259,7 +270,7 @@ function logout(){
   go("#/");
 }
 
-/* ---------- Device identity (per browser) ---------- */
+/* ---------- Device identity ---------- */
 function getDeviceId(){
   let d = localStorage.getItem(DEVICE_KEY);
   if(!d){
@@ -269,21 +280,21 @@ function getDeviceId(){
   return d;
 }
 
-/* ---------- Progress (last lesson) ---------- */
+/* ---------- Progress ---------- */
 function loadProgress(){
   try{ return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); }
   catch{ return {}; }
 }
 function saveProgress(p){ localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
 
-function setUserLastLesson(lessonId){
+function setUserLast(type, id){
   const s = getSession();
   if(!s) return;
   const p = loadProgress();
-  p[s.id] = { lastLessonId: lessonId, updatedAt: Date.now() };
+  p[s.id] = { type, id, updatedAt: Date.now() };
   saveProgress(p);
 }
-function getUserLastLesson(){
+function getUserLast(){
   const s = getSession();
   if(!s) return null;
   const p = loadProgress();
@@ -294,26 +305,22 @@ function getUserLastLesson(){
 function seedData(){
   return {
     users: [
-      // ✅ الأدمن فقط (لا نعرضه بأي مكان في الواجهة)
       { id:"u_admin", username:"bahaa_hajaj", password:"bahaahajaj0775135361n", role:"admin", name:"Baha Admin", deviceId:"*" }
     ],
-    fields: [
-      { id:"g_2008", name:"جيل 2008", desc:"مهام ومستندات خاصة بطلاب 2008" },
-      { id:"g_2009", name:"جيل 2009", desc:"مهام ومستندات خاصة بطلاب 2009" },
-      { id:"g_2010", name:"جيل 2010", desc:"مهام ومستندات خاصة بطلاب 2010" }
+    generations: [
+      { id:"g_2008", name:"جيل 2008", desc:"" },
+      { id:"g_2009", name:"جيل 2009", desc:"" },
+      { id:"g_2010", name:"جيل 2010", desc:"" }
     ],
-    courses: [
-      { id:"t_2008_1", fieldId:"g_2008", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
-      { id:"t_2009_1", fieldId:"g_2009", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
-      { id:"t_2010_1", fieldId:"g_2010", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" }
+    tasks: [
+      // فارغة افتراضياً — أنت بتضيف المهمات بأسمائها من الأدمن
     ],
-    lessons: [
-      { id:"lesson_1", courseId:"t_2008_1", title:"درس 1 - اليوم الأول",
-        contentHtml:`<h2>درس 1</h2><p>ابدأ من هنا…</p>`,
-        createdAt: Date.now()
-      }
+    taskDocs: [
+      // { id, taskId, displayName, filename, mime, size, dataUrl, createdAt }
     ],
-    docs: []
+    pythonLessons: [
+      // { id, title, slides:[{title, bulletsText, codeText}], createdAt }
+    ]
   };
 }
 
@@ -326,7 +333,7 @@ function loadDB(){
   }
   try{
     const d = JSON.parse(raw);
-    if(!d.fields || !d.courses || !d.lessons || !d.docs || !d.users) throw new Error("bad");
+    if(!d.users || !d.generations || !d.tasks || !d.taskDocs || !d.pythonLessons) throw new Error("bad");
     return d;
   }catch{
     const d = seedData();
@@ -337,18 +344,17 @@ function loadDB(){
 function saveDB(db){ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
 
 /* ---------- Helpers ---------- */
-function dbFind(db, arrName, id){ return db[arrName].find(x => x.id === id); }
-function coursesByField(db, fieldId){ return db.courses.filter(c => c.fieldId === fieldId); }
-function lessonsByCourse(db, courseId){
-  return db.lessons.filter(l => l.courseId === courseId).sort((a,b)=> (a.createdAt||0)-(b.createdAt||0));
-}
-function docsByCourse(db, courseId){
-  return db.docs.filter(d => d.courseId === courseId).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
-}
-
-/* ---------- User auth: login/register per device ---------- */
 function normalizeU(u){ return (u||"").trim().toLowerCase(); }
+function dbFind(db, arr, id){ return db[arr].find(x => x.id === id); }
+function tasksByGen(db, genId){ return db.tasks.filter(t => t.genId === genId); }
+function docsByTask(db, taskId){
+  return db.taskDocs.filter(d => d.taskId === taskId).sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+}
+function pythonLessonsSorted(db){
+  return db.pythonLessons.slice().sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+}
 
+/* ---------- Auth: register/login per device ---------- */
 function findUserForDevice(db, username, deviceId){
   const u = normalizeU(username);
   return db.users.find(x =>
@@ -356,46 +362,32 @@ function findUserForDevice(db, username, deviceId){
     (x.role === "admin" ? true : x.deviceId === deviceId)
   );
 }
-
 function registerStudent(db, username, password, deviceId){
   const u = (username||"").trim();
   const p = (password||"").trim();
 
   if(u.length < 3) return { ok:false, msg:"اسم المستخدم لازم يكون 3 أحرف أو أكثر." };
   if(p.length < 4) return { ok:false, msg:"كلمة المرور لازم تكون 4 أحرف/أرقام أو أكثر." };
-
-  // لا نسمح بتسجيل طالب على اسم الأدمن
   if(normalizeU(u) === "bahaa_hajaj") return { ok:false, msg:"هذا الاسم محجوز." };
 
-  // على نفس الجهاز: ممنوع تكرار نفس اليوزر
   const existsSameDevice = db.users.find(x => x.role !== "admin" && x.deviceId === deviceId && normalizeU(x.username) === normalizeU(u));
-  if(existsSameDevice) return { ok:false, msg:"هذا المستخدم موجود على هذا الجهاز. جرّب تسجيل الدخول بدل إنشاء حساب." };
+  if(existsSameDevice) return { ok:false, msg:"هذا المستخدم موجود على هذا الجهاز. سجّل دخول بدل إنشاء." };
 
-  const newUser = {
-    id: uid("u"),
-    username: u,
-    password: p,
-    role: "student",
-    name: u,
-    deviceId
-  };
+  const newUser = { id: uid("u"), username: u, password: p, role:"student", name: u, deviceId };
   db.users.push(newUser);
   saveDB(db);
   return { ok:true, user:newUser };
 }
-
 function loginUser(db, username, password, deviceId){
   const u = (username||"").trim();
   const p = (password||"").trim();
   const user = findUserForDevice(db, u, deviceId);
-
-  if(!user) return { ok:false, msg:"المستخدم غير موجود على هذا الجهاز. إذا أول مرة، اختر (إنشاء حساب جديد)." };
+  if(!user) return { ok:false, msg:"المستخدم غير موجود على هذا الجهاز. إذا أول مرة اختر إنشاء حساب جديد." };
   if(user.password !== p) return { ok:false, msg:"كلمة المرور غير صحيحة." };
-
   return { ok:true, user };
 }
 
-/* ---------- Navigation render ---------- */
+/* ---------- Nav ---------- */
 function renderNav(){
   const s = getSession();
   const isAuthed = !!s;
@@ -408,7 +400,7 @@ function renderNav(){
 
 /* ---------- Router ---------- */
 function hideAllPages(){
-  ["home","course","lesson","search","login","admin"].forEach(p=>{
+  ["home","task","python","python-lesson","search","login","admin"].forEach(p=>{
     $("#page-"+p).classList.add("hide");
   });
 }
@@ -419,11 +411,13 @@ function route(){
   const hash = location.hash || "#/";
   const parts = hash.replace("#","").split("/").filter(Boolean);
 
-  if(parts.length === 0){ renderHome(); return; }
+  if(parts.length === 0) return renderHome();
 
   const [p, id] = parts;
-  if(p === "course" && id) return renderCourse(id);
-  if(p === "lesson" && id) return renderLesson(id);
+
+  if(p === "task" && id) return renderTask(id);
+  if(p === "python") return renderPython();
+  if(p === "pythonLesson" && id) return renderPythonLesson(id);
   if(p === "search") return renderSearch();
   if(p === "login") return renderLogin();
   if(p === "admin") return renderAdmin();
@@ -437,68 +431,62 @@ function renderHome(){
   const root = $("#page-home");
   root.classList.remove("hide");
 
-  const last = getUserLastLesson();
-  const lastLesson = last?.lastLessonId ? dbFind(db,"lessons", last.lastLessonId) : null;
+  const last = getUserLast();
+  let lastHtml = `<div class="muted">سجّل دخول عشان نحفظ آخر شيء وصلت له على هذا الجهاز.</div>`;
+  if(last){
+    if(last.type === "task"){
+      lastHtml = `<div class="alert ok"><div><b>أكمل من حيث توقفت:</b> آخر مهمة فتحتها</div>
+      <button class="btn small" onclick="go('#/task/${esc(last.id)}')">متابعة</button></div>`;
+    }else if(last.type === "python"){
+      lastHtml = `<div class="alert ok"><div><b>أكمل من حيث توقفت:</b> آخر درس بايثون فتحته</div>
+      <button class="btn small" onclick="go('#/pythonLesson/${esc(last.id)}')">متابعة</button></div>`;
+    }
+  }
 
-  const latestLessons = db.lessons
-    .slice()
-    .sort((a,b)=> (b.createdAt||0)-(a.createdAt||0))
-    .slice(0, 7);
+  const py = pythonLessonsSorted(db).slice(0,5);
 
   root.innerHTML = `
     <div class="card" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <h1 class="h1">الأجيال</h1>
-          <div class="muted">اختر الجيل ثم افتح المهمة، وبعدها حمل مستندات المهمة أو اقرأ الدروس.</div>
+          <h1 class="h1">الرئيسية</h1>
+          <div class="muted">الأجيال → المهمات → مستندات المهمة. ودروس بايثون كبرسنتيشن.</div>
         </div>
         <div class="row">
-          <span class="pill">2008</span><span class="pill">2009</span><span class="pill">2010</span>
+          <button class="btn ghost dark" onclick="go('#/python')">دروس بايثون</button>
         </div>
       </div>
-
-      ${
-        lastLesson ? `
-          <div class="alert ok" style="margin-top:10px">
-            <div><b>أكمل من حيث توقفت:</b> ${esc(lastLesson.title)}</div>
-            <button class="btn small" onclick="go('#/lesson/${lastLesson.id}')">متابعة</button>
-          </div>
-        ` : `
-          <div class="muted">سجّل دخول بحسابك (على هذا الجهاز) عشان نحفظ آخر درس وصلت له.</div>
-        `
-      }
+      ${lastHtml}
     </div>
 
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <div class="h2">الدروس اليومية (آخر الدروس)</div>
-          <div class="muted">كل يوم أضف درس جديد من لوحة التحكم (للأدمن).</div>
+          <div class="h2">آخر دروس بايثون</div>
+          <div class="muted">تضاف من لوحة التحكم (برسنتيشن).</div>
         </div>
       </div>
       <div class="list">
         ${
-          latestLessons.length ? latestLessons.map(l=>{
-            const task = dbFind(db,"courses", l.courseId);
-            return `
-              <div class="item">
-                <div>
-                  <div class="title">${esc(l.title)}</div>
-                  <div class="sub">ضمن: ${esc(task?.title || "—")} • ${new Date(l.createdAt||Date.now()).toLocaleDateString("ar")}</div>
-                </div>
-                <div class="meta">
-                  <button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button>
-                </div>
+          py.length ? py.map(l=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(l.title)}</div>
+                <div class="sub">${new Date(l.createdAt||Date.now()).toLocaleDateString("ar")}</div>
               </div>
-            `;
-          }).join("") : `<div class="muted">لا يوجد دروس بعد.</div>`
+              <div class="meta">
+                <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+              </div>
+            </div>
+          `).join("") : `<div class="muted">لا يوجد دروس بايثون بعد.</div>`
         }
       </div>
     </div>
   `;
 
-  db.fields.forEach(g=>{
-    const tasks = coursesByField(db, g.id);
+  // Generations + tasks + docs preview
+  db.generations.forEach(g=>{
+    const tasks = tasksByGen(db, g.id);
     const html = `
       <div class="card">
         <div class="cardHeader">
@@ -511,17 +499,20 @@ function renderHome(){
 
         <div class="list">
           ${
-            tasks.length ? tasks.map(t=>`
-              <div class="item">
-                <div>
-                  <div class="title">${esc(t.title)}</div>
-                  <div class="sub">${esc(t.description || "")}</div>
+            tasks.length ? tasks.map(t=>{
+              const docsCount = docsByTask(db, t.id).length;
+              return `
+                <div class="item">
+                  <div>
+                    <div class="title">${esc(t.title)}</div>
+                    <div class="sub">${esc(t.description||"")} • ${docsCount} مستند</div>
+                  </div>
+                  <div class="meta">
+                    <button class="btn small" onclick="go('#/task/${t.id}')">فتح المهمة</button>
+                  </div>
                 </div>
-                <div class="meta">
-                  <button class="btn small" onclick="go('#/course/${t.id}')">فتح المهمة</button>
-                </div>
-              </div>
-            `).join("") : `<div class="muted">لا يوجد مهام بعد.</div>`
+              `;
+            }).join("") : `<div class="muted">لا يوجد مهام بعد. (أضفها من لوحة التحكم)</div>`
           }
         </div>
       </div>
@@ -530,16 +521,17 @@ function renderHome(){
   });
 }
 
-function renderCourse(taskId){
+function renderTask(taskId){
   const db = loadDB();
-  const task = dbFind(db, "courses", taskId);
+  const task = dbFind(db, "tasks", taskId);
   if(!task){ showAlert("bad","المهمة غير موجودة"); return go("#/"); }
 
-  const gen = dbFind(db, "fields", task.fieldId);
-  const lessons = lessonsByCourse(db, taskId);
-  const docs = docsByCourse(db, taskId);
+  const gen = dbFind(db, "generations", task.genId);
+  const docs = docsByTask(db, taskId);
 
-  const root = $("#page-course");
+  setUserLast("task", taskId);
+
+  const root = $("#page-task");
   root.classList.remove("hide");
 
   root.innerHTML = `
@@ -547,12 +539,11 @@ function renderCourse(taskId){
       <div class="cardHeader">
         <div>
           <h1 class="h1">${esc(task.title)}</h1>
-          <div class="muted">الجيل: <b>${esc(gen?.name || "-")}</b></div>
-          <div class="muted">${esc(task.description || "")}</div>
+          <div class="muted">الجيل: <b>${esc(gen?.name||"-")}</b></div>
+          <div class="muted">${esc(task.description||"")}</div>
         </div>
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
-          <span class="pill">${lessons.length} درس</span>
           <span class="pill">${docs.length} مستند</span>
         </div>
       </div>
@@ -561,34 +552,11 @@ function renderCourse(taskId){
         <div class="card soft">
           <div class="cardHeader">
             <div>
-              <div class="h2">الدروس</div>
-              <div class="muted">اضغط على أي درس لفتحه.</div>
-            </div>
-          </div>
-          <div class="list">
-            ${
-              lessons.length ? lessons.map(l=>`
-                <div class="item">
-                  <div>
-                    <div class="title">${esc(l.title)}</div>
-                    <div class="sub">${new Date(l.createdAt||Date.now()).toLocaleString("ar")}</div>
-                  </div>
-                  <div class="meta">
-                    <button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button>
-                  </div>
-                </div>
-              `).join("") : `<div class="muted">لا يوجد دروس بعد.</div>`
-            }
-          </div>
-        </div>
-
-        <div class="card soft">
-          <div class="cardHeader">
-            <div>
               <div class="h2">مستندات المهمة</div>
-              <div class="muted">حمّل المستندات المطلوبة للمهمة.</div>
+              <div class="muted">تنزيل مستندات هذه المهمة.</div>
             </div>
           </div>
+
           <div class="list">
             ${
               docs.length ? docs.map(d=>`
@@ -598,7 +566,7 @@ function renderCourse(taskId){
                     <div class="sub">${esc(d.filename)} • ${Math.round((d.size||0)/1024)} KB</div>
                   </div>
                   <div class="meta">
-                    <button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button>
+                    <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
                   </div>
                 </div>
               `).join("") : `<div class="muted">لا يوجد مستندات بعد.</div>`
@@ -606,25 +574,70 @@ function renderCourse(taskId){
           </div>
 
           <div class="alert warn" style="margin-top:12px">
-            <div><b>تنبيه:</b> المستندات تُخزَّن محليًا داخل المتصفح (LocalStorage) وقد لا تناسب الملفات الكبيرة.</div>
+            <div><b>تنبيه:</b> المستندات تُحفظ محليًا داخل المتصفح (LocalStorage).</div>
             <button class="btn small dark" onclick="hideAlert()">حسنًا</button>
           </div>
+        </div>
+
+        <div class="card soft">
+          <div class="cardHeader">
+            <div>
+              <div class="h2">ملاحظات المهمة</div>
+              <div class="muted">اكتب وصف المهمة من لوحة التحكم، وسيظهر هنا.</div>
+            </div>
+          </div>
+          <div class="muted">${esc(task.description || "لا يوجد وصف بعد.")}</div>
         </div>
       </div>
     </div>
   `;
 }
 
-function renderLesson(lessonId){
+/* ---------- Python pages (presentation) ---------- */
+function renderPython(){
   const db = loadDB();
-  const lesson = dbFind(db, "lessons", lessonId);
-  if(!lesson){ showAlert("bad","الدرس غير موجود"); return go("#/"); }
+  const root = $("#page-python");
+  root.classList.remove("hide");
 
-  setUserLastLesson(lessonId);
+  const lessons = pythonLessonsSorted(db);
 
-  const task = dbFind(db, "courses", lesson.courseId);
+  root.innerHTML = `
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <h1 class="h1">دروس بايثون</h1>
+          <div class="muted">دروس على شكل برسنتيشن (شرائح) تضاف من لوحة التحكم.</div>
+        </div>
+        <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
+      </div>
 
-  const root = $("#page-lesson");
+      <div class="list">
+        ${
+          lessons.length ? lessons.map(l=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(l.title)}</div>
+                <div class="sub">${new Date(l.createdAt||Date.now()).toLocaleString("ar")}</div>
+              </div>
+              <div class="meta">
+                <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+              </div>
+            </div>
+          `).join("") : `<div class="muted">لا يوجد دروس بعد. (أضفها من لوحة التحكم)</div>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function renderPythonLesson(id){
+  const db = loadDB();
+  const lesson = dbFind(db, "pythonLessons", id);
+  if(!lesson){ showAlert("bad","درس بايثون غير موجود"); return go("#/python"); }
+
+  setUserLast("python", id);
+
+  const root = $("#page-python-lesson");
   root.classList.remove("hide");
 
   root.innerHTML = `
@@ -632,23 +645,36 @@ function renderLesson(lessonId){
       <div class="lessonHeader">
         <div class="row" style="justify-content:space-between">
           <div>
-            <div class="bismillah">بسم الله الرحمن الرحيم</div>
+            <div style="font-weight:900;opacity:.95">بسم الله الرحمن الرحيم</div>
             <div class="lessonTitle">${esc(lesson.title)}</div>
-            <div style="opacity:.92; margin-top:6px">المهمة: <b>${esc(task?.title || "-")}</b></div>
           </div>
           <div class="row">
-            <button class="btn ghost" onclick="go('#/course/${lesson.courseId}')">رجوع للمهمة</button>
+            <button class="btn ghost" onclick="go('#/python')">رجوع</button>
             <button class="btn ghost" onclick="go('#/')">الرئيسية</button>
           </div>
         </div>
       </div>
+
       <div class="lessonBody">
-        ${lesson.contentHtml || "<p>لا يوجد محتوى</p>"}
+        ${
+          (lesson.slides||[]).length ? (lesson.slides||[]).map((s,idx)=>`
+            <div class="slide">
+              <h3>${idx+1}. ${esc(s.title || "شريحة")}</h3>
+              ${
+                (s.bullets||[]).length ? `<ul>${s.bullets.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>` : `<div class="muted">—</div>`
+              }
+              ${
+                s.code ? `<pre>${esc(s.code)}</pre>` : ``
+              }
+            </div>
+          `).join("") : `<div class="muted">لا يوجد شرائح بعد.</div>`
+        }
       </div>
     </div>
   `;
 }
 
+/* ---------- Search ---------- */
 function renderSearch(){
   const root = $("#page-search");
   root.classList.remove("hide");
@@ -658,14 +684,14 @@ function renderSearch(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">بحث</h1>
-          <div class="muted">ابحث داخل الأجيال/المهام/الدروس/المستندات.</div>
+          <div class="muted">ابحث داخل الأجيال/المهمات/المستندات/دروس بايثون.</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
 
       <div class="form">
         <label>اكتب كلمة البحث</label>
-        <input id="q" placeholder="مثال: مهمة 1 / درس 2 ..." oninput="doSearch()">
+        <input id="q" placeholder="مثال: مهمة قواعد / متغيرات / loops ..." oninput="doSearch()">
       </div>
 
       <div id="searchResults" class="grid" style="margin-top:14px"></div>
@@ -681,18 +707,16 @@ function doSearch(){
   const out = $("#searchResults");
   if(!out) return;
 
-  const hits = { fields:[], courses:[], lessons:[], docs:[] };
   const match = (s)=> (s||"").toLowerCase().includes(q);
-
   if(!q){
     out.innerHTML = `<div class="card soft" style="grid-column:1/-1"><div class="muted">اكتب كلمة للبحث…</div></div>`;
     return;
   }
 
-  db.fields.forEach(f=>{ if(match(f.name) || match(f.desc)) hits.fields.push(f); });
-  db.courses.forEach(c=>{ if(match(c.title) || match(c.description)) hits.courses.push(c); });
-  db.lessons.forEach(l=>{ if(match(l.title) || match(l.contentHtml)) hits.lessons.push(l); });
-  db.docs.forEach(d=>{ if(match(d.displayName) || match(d.filename)) hits.docs.push(d); });
+  const gens = db.generations.filter(g=> match(g.name) || match(g.desc));
+  const tasks = db.tasks.filter(t=> match(t.title) || match(t.description));
+  const docs = db.taskDocs.filter(d=> match(d.displayName) || match(d.filename));
+  const py = db.pythonLessons.filter(l=> match(l.title) || (l.slides||[]).some(s=> match(s.title) || (s.bullets||[]).some(b=>match(b)) || match(s.code)));
 
   const mk = (title, items) => `
     <div class="card soft">
@@ -700,49 +724,57 @@ function doSearch(){
         <div class="h2">${title}</div>
         <span class="pill">${items.length}</span>
       </div>
-      <div class="list">${
-        items.length ? items.join("") : `<div class="muted">لا نتائج</div>`
-      }</div>
+      <div class="list">${items.length ? items.join("") : `<div class="muted">لا نتائج</div>`}</div>
     </div>
   `;
 
-  const fieldsHtml = hits.fields.map(f=>`
-    <div class="item">
-      <div><div class="title">${esc(f.name)}</div><div class="sub">${esc(f.desc||"")}</div></div>
-      <div class="meta"><span class="pill">جيل</span></div>
-    </div>
-  `);
-
-  const tasksHtml = hits.courses.map(t=>`
-    <div class="item">
-      <div><div class="title">${esc(t.title)}</div><div class="sub">${esc(t.description||"")}</div></div>
-      <div class="meta"><button class="btn small" onclick="go('#/course/${t.id}')">فتح</button></div>
-    </div>
-  `);
-
-  const lessonsHtml = hits.lessons.map(l=>`
-    <div class="item">
-      <div><div class="title">${esc(l.title)}</div><div class="sub">درس</div></div>
-      <div class="meta"><button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button></div>
-    </div>
-  `);
-
-  const docsHtml = hits.docs.map(d=>`
-    <div class="item">
-      <div><div class="title">${esc(d.displayName)}</div><div class="sub">${esc(d.filename)}</div></div>
-      <div class="meta"><button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button></div>
-    </div>
-  `);
-
   out.innerHTML = `
-    ${mk("نتائج الأجيال", fieldsHtml)}
-    ${mk("نتائج المهام", tasksHtml)}
-    ${mk("نتائج الدروس", lessonsHtml)}
-    ${mk("نتائج المستندات", docsHtml)}
+    ${mk("الأجيال", gens.map(g=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(g.name)}</div>
+          <div class="sub">${esc(g.desc||"")}</div>
+        </div>
+        <div class="meta"><span class="pill">جيل</span></div>
+      </div>
+    `))}
+    ${mk("المهمات", tasks.map(t=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(t.title)}</div>
+          <div class="sub">${esc(t.description||"")}</div>
+        </div>
+        <div class="meta">
+          <button class="btn small" onclick="go('#/task/${t.id}')">فتح</button>
+        </div>
+      </div>
+    `))}
+    ${mk("المستندات", docs.map(d=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(d.displayName)}</div>
+          <div class="sub">${esc(d.filename)}</div>
+        </div>
+        <div class="meta">
+          <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
+        </div>
+      </div>
+    `))}
+    ${mk("دروس بايثون", py.map(l=>`
+      <div class="item">
+        <div>
+          <div class="title">${esc(l.title)}</div>
+          <div class="sub">درس برسنتيشن</div>
+        </div>
+        <div class="meta">
+          <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+        </div>
+      </div>
+    `))}
   `;
 }
 
-/* ---------- Login/Register page ---------- */
+/* ---------- Login/Register ---------- */
 function renderLogin(){
   const root = $("#page-login");
   root.classList.remove("hide");
@@ -757,8 +789,7 @@ function renderLogin(){
         <div>
           <h1 class="h1">تسجيل الدخول</h1>
           <div class="muted">
-            ملاحظة: <b>كل جهاز له حسابه الخاص</b>. إذا أول مرة عندك على هذا الجهاز، اختر "إنشاء حساب جديد"
-            وسجّل باسم مستخدم مختلف عن غيرك. الحساب ينحفظ على نفس الجهاز.
+            ملاحظة: كل جهاز له حسابه الخاص. أنشئ حساب طالب باسم مختلف، وسيبقى محفوظًا على نفس الجهاز.
           </div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
@@ -779,7 +810,7 @@ function renderLogin(){
         <button class="btn" type="submit">متابعة</button>
 
         <div class="help">
-          إذا كان عندك حساب سابق على نفس الجهاز: أزل علامة "إنشاء حساب جديد" ثم سجّل دخول بنفس البيانات.
+          إذا عندك حساب سابق على نفس الجهاز: أزل علامة "إنشاء حساب جديد" ثم ادخل نفس البيانات.
         </div>
       </form>
     </div>
@@ -794,7 +825,6 @@ function doAuth(){
   const u = ($("#username").value || "").trim();
   const p = ($("#password").value || "").trim();
 
-  // لو كان الأدمن: لازم يكون تسجيل دخول فقط (حتى ما ينشئ طالب بنفس الاسم)
   if(normalizeU(u) === "bahaa_hajaj"){
     const r = loginUser(db, u, p, deviceId);
     if(!r.ok){ showAlert("bad", r.msg); return; }
@@ -820,7 +850,7 @@ function doAuth(){
   go("#/");
 }
 
-/* ---------- Admin Page ---------- */
+/* ---------- Admin ---------- */
 function requireAdmin(){
   const s = getSession();
   if(!s || s.role !== "admin"){
@@ -833,7 +863,6 @@ function requireAdmin(){
 
 function renderAdmin(){
   if(!requireAdmin()) return;
-
   const db = loadDB();
   const root = $("#page-admin");
   root.classList.remove("hide");
@@ -843,178 +872,205 @@ function renderAdmin(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">لوحة التحكم</h1>
-          <div class="muted">إضافة/حذف: أجيال + مهام + دروس + مستندات (محليًا).</div>
+          <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
         </div>
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
-          <button class="btn danger" onclick="resetAll()">إعادة ضبط</button>
+          <button class="btn danger" onclick="resetAll()">إعادة ضبط البيانات</button>
         </div>
       </div>
 
       <div class="grid">
-        ${adminStatsCard("الأجيال", db.fields.length)}
-        ${adminStatsCard("المهام", db.courses.length)}
-        ${adminStatsCard("الدروس", db.lessons.length)}
-        ${adminStatsCard("المستندات", db.docs.length)}
+        ${adminStatsCard("الأجيال", db.generations.length)}
+        ${adminStatsCard("المهمات", db.tasks.length)}
+        ${adminStatsCard("مستندات المهمات", db.taskDocs.length)}
+        ${adminStatsCard("دروس بايثون", db.pythonLessons.length)}
       </div>
     </div>
 
     <div class="grid" style="margin-top:14px">
+
+      <!-- Add Generation -->
       <div class="card">
         <div class="cardHeader">
           <div>
             <div class="h2">إضافة جيل</div>
-            <div class="muted">مثال: جيل 2011</div>
+            <div class="muted">أنت تختار اسم الجيل.</div>
           </div>
         </div>
-        <form class="form" onsubmit="event.preventDefault(); addField();">
+        <form class="form" onsubmit="event.preventDefault(); addGen();">
           <label>اسم الجيل</label>
-          <input id="fieldName" placeholder="جيل 2011" required>
+          <input id="genName" placeholder="مثال: جيل 2011" required>
           <label>وصف مختصر</label>
-          <input id="fieldDesc" placeholder="وصف للجيل">
+          <input id="genDesc" placeholder="اختياري">
           <button class="btn" type="submit">إضافة</button>
         </form>
 
         <div style="margin-top:12px" class="list">
-          ${db.fields.map(f=>`
+          ${db.generations.map(g=>`
             <div class="item">
               <div>
-                <div class="title">${esc(f.name)}</div>
-                <div class="sub">${esc(f.desc||"")}</div>
+                <div class="title">${esc(g.name)}</div>
+                <div class="sub">${esc(g.desc||"")}</div>
               </div>
               <div class="meta">
-                <button class="btn small danger" onclick="delField('${f.id}')">حذف</button>
+                <button class="btn small danger" onclick="delGen('${g.id}')">حذف</button>
               </div>
             </div>
           `).join("")}
         </div>
       </div>
 
+      <!-- Add Task -->
       <div class="card">
         <div class="cardHeader">
           <div>
-            <div class="h2">إضافة مهمة</div>
-            <div class="muted">المهمة مرتبطة بجيل.</div>
+            <div class="h2">إضافة مهمة داخل جيل</div>
+            <div class="muted">أنت تكتب اسم المهمة بنفسك.</div>
           </div>
         </div>
-        <form class="form" onsubmit="event.preventDefault(); addCourse();">
-          <label>الجيل</label>
-          <select id="courseFieldId" required>
-            ${db.fields.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join("")}
+        <form class="form" onsubmit="event.preventDefault(); addTask();">
+          <label>اختر الجيل</label>
+          <select id="taskGenId" required>
+            ${db.generations.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("")}
           </select>
-          <label>عنوان المهمة</label>
-          <input id="courseTitle" placeholder="مهمة 2" required>
-          <label>وصف مختصر</label>
-          <input id="courseDesc" placeholder="مطلوب: …">
+
+          <label>اسم المهمة</label>
+          <input id="taskTitle" placeholder="مثال: مهمة قواعد البيانات" required>
+
+          <label>وصف المهمة</label>
+          <input id="taskDesc" placeholder="اختياري">
+
           <button class="btn" type="submit">إضافة</button>
         </form>
 
         <div style="margin-top:12px" class="list">
-          ${db.courses.slice().reverse().map(c=>{
-            const f = dbFind(db,"fields",c.fieldId);
+          ${db.tasks.slice().reverse().map(t=>{
+            const g = dbFind(db,"generations",t.genId);
             return `
               <div class="item">
                 <div>
-                  <div class="title">${esc(c.title)}</div>
-                  <div class="sub">${esc(f?.name||"-")} • ${esc(c.description||"")}</div>
+                  <div class="title">${esc(t.title)}</div>
+                  <div class="sub">${esc(g?.name||"-")} • ${esc(t.description||"")}</div>
                 </div>
                 <div class="meta">
-                  <button class="btn small" onclick="go('#/course/${c.id}')">فتح</button>
-                  <button class="btn small danger" onclick="delCourse('${c.id}')">حذف</button>
+                  <button class="btn small" onclick="go('#/task/${t.id}')">فتح</button>
+                  <button class="btn small danger" onclick="delTask('${t.id}')">حذف</button>
                 </div>
               </div>
             `;
-          }).join("")}
+          }).join("") || `<div class="muted">لا يوجد مهمات بعد.</div>`}
         </div>
       </div>
 
-      <div class="card">
-        <div class="cardHeader">
-          <div>
-            <div class="h2">إضافة درس</div>
-            <div class="muted">اختَر المهمة ثم اكتب محتوى الدرس.</div>
-          </div>
-        </div>
-
-        <form class="form" onsubmit="event.preventDefault(); addLesson();">
-          <label>المهمة</label>
-          <select id="lessonCourseId" required>
-            ${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}
-          </select>
-
-          <label>عنوان الدرس</label>
-          <input id="lessonTitle" placeholder="درس 2 - اليوم الثاني" required>
-
-          <label>محتوى الدرس (HTML)</label>
-          <textarea id="lessonHtml" placeholder="<h2>عنوان</h2><p>شرح...</p><pre>print(&quot;Hello&quot;)</pre>"></textarea>
-
-          <div class="help">للكود استخدم: <b>&lt;pre&gt;...&lt;/pre&gt;</b></div>
-          <button class="btn" type="submit">إضافة</button>
-        </form>
-
-        <div style="margin-top:12px" class="list">
-          ${db.lessons.slice().reverse().slice(0,10).map(l=>{
-            const c = dbFind(db,"courses",l.courseId);
-            return `
-              <div class="item">
-                <div>
-                  <div class="title">${esc(l.title)}</div>
-                  <div class="sub">${esc(c?.title||"-")}</div>
-                </div>
-                <div class="meta">
-                  <button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button>
-                  <button class="btn small danger" onclick="delLesson('${l.id}')">حذف</button>
-                </div>
-              </div>
-            `;
-          }).join("")}
-        </div>
-      </div>
-
+      <!-- Upload Task Document (Gen -> Task) -->
       <div class="card">
         <div class="cardHeader">
           <div>
             <div class="h2">رفع مستند لمهمة</div>
-            <div class="muted">يرتبط بمهمة (محليًا).</div>
+            <div class="muted">اختر الجيل ثم المهمة، واكتب اسم المستند.</div>
           </div>
         </div>
 
-        <form class="form" onsubmit="event.preventDefault(); addDoc();">
-          <label>المهمة</label>
-          <select id="docCourseId" required>
-            ${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}
+        <form class="form" onsubmit="event.preventDefault(); addTaskDoc();">
+          <label>اختر الجيل</label>
+          <select id="docGenId" onchange="refreshDocTasks()" required>
+            ${db.generations.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("")}
           </select>
 
-          <label>اسم يظهر للطلاب</label>
-          <input id="docName" placeholder="مستند مهمة 1 - PDF" required>
+          <label>اختر المهمة</label>
+          <select id="docTaskId" required></select>
+
+          <label>اسم المستند (يظهر للطلاب)</label>
+          <input id="docDisplayName" placeholder="مثال: حل المهمة PDF" required>
 
           <label>اختر الملف</label>
           <input id="docFile" type="file" required>
 
           <button class="btn" type="submit">رفع</button>
-          <div class="help">مناسب للملفات الصغيرة (LocalStorage).</div>
+          <div class="help">ملاحظة: التخزين محلي (LocalStorage) مناسب للملفات الصغيرة.</div>
         </form>
 
         <div style="margin-top:12px" class="list">
-          ${db.docs.slice().reverse().slice(0,10).map(d=>{
-            const c = dbFind(db,"courses",d.courseId);
+          ${db.taskDocs.slice().reverse().slice(0,10).map(d=>{
+            const t = dbFind(db,"tasks",d.taskId);
+            const g = t ? dbFind(db,"generations",t.genId) : null;
             return `
               <div class="item">
                 <div>
                   <div class="title">${esc(d.displayName)}</div>
-                  <div class="sub">${esc(c?.title||"-")} • ${esc(d.filename)} • ${Math.round((d.size||0)/1024)} KB</div>
+                  <div class="sub">${esc(g?.name||"-")} • ${esc(t?.title||"-")} • ${esc(d.filename)}</div>
                 </div>
                 <div class="meta">
-                  <button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button>
-                  <button class="btn small danger" onclick="delDoc('${d.id}')">حذف</button>
+                  <button class="btn small ok" onclick="downloadTaskDoc('${d.id}')">تنزيل</button>
+                  <button class="btn small danger" onclick="delTaskDoc('${d.id}')">حذف</button>
                 </div>
               </div>
             `;
-          }).join("")}
+          }).join("") || `<div class="muted">لا يوجد مستندات بعد.</div>`}
         </div>
       </div>
+
+      <!-- Add Python Lesson (presentation) -->
+      <div class="card">
+        <div class="cardHeader">
+          <div>
+            <div class="h2">إضافة درس بايثون (برسنتيشن)</div>
+            <div class="muted">تكتب محتوى مرتب، والطلاب يفتحوه كشرائح.</div>
+          </div>
+        </div>
+
+        <form class="form" onsubmit="event.preventDefault(); addPythonLesson();">
+          <label>عنوان الدرس</label>
+          <input id="pyTitle" placeholder="مثال: المتغيرات في بايثون" required>
+
+          <div class="split">
+            <div>
+              <label>عنوان الشريحة</label>
+              <input id="pySlideTitle" placeholder="مثال: ما هو المتغير؟" required>
+            </div>
+            <div>
+              <label>كود (اختياري)</label>
+              <input id="pySlideCodeOneLine" placeholder='مثال: name = "Ali"'>
+            </div>
+          </div>
+
+          <label>نقاط الشريحة (كل سطر نقطة)</label>
+          <textarea id="pySlideBullets" placeholder="اكتب نقاط...\nكل سطر = نقطة"></textarea>
+
+          <div class="row">
+            <button class="btn dark" type="button" onclick="addSlideToDraft()">+ إضافة الشريحة إلى المسودة</button>
+            <span class="pill" id="draftCount">0 شريحة</span>
+            <button class="btn" type="submit">حفظ الدرس</button>
+          </div>
+
+          <div class="help">نصيحة: اعمل 5-10 شرائح للدرس، وبعدها اضغط حفظ.</div>
+
+          <div id="draftPreview" class="list" style="margin-top:10px"></div>
+        </form>
+
+        <div style="margin-top:12px" class="list">
+          ${pythonLessonsSorted(db).slice(0,10).map(l=>`
+            <div class="item">
+              <div>
+                <div class="title">${esc(l.title)}</div>
+                <div class="sub">${(l.slides||[]).length} شريحة • ${new Date(l.createdAt||Date.now()).toLocaleDateString("ar")}</div>
+              </div>
+              <div class="meta">
+                <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
+                <button class="btn small danger" onclick="delPythonLesson('${l.id}')">حذف</button>
+              </div>
+            </div>
+          `).join("") || `<div class="muted">لا يوجد دروس بايثون بعد.</div>`}
+        </div>
+      </div>
+
     </div>
   `;
+
+  // fill dependent dropdown for docs
+  refreshDocTasks();
+  resetDraftUI();
 }
 
 function adminStatsCard(title, num){
@@ -1026,114 +1082,101 @@ function adminStatsCard(title, num){
   `;
 }
 
-/* ---------- Admin Actions ---------- */
+/* ---------- Admin actions ---------- */
 function resetAll(){
   if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(PROGRESS_KEY);
-  // ما نحذف DEVICE_KEY حتى يضل نفس الجهاز معروف
+  // DEVICE_KEY لا نحذفه حتى يظل الجهاز معروف
   showAlert("ok","تمت إعادة الضبط");
   route();
 }
 
-function addField(){
+function addGen(){
   const db = loadDB();
-  const name = ($("#fieldName").value||"").trim();
-  const desc = ($("#fieldDesc").value||"").trim();
+  const name = ($("#genName").value||"").trim();
+  const desc = ($("#genDesc").value||"").trim();
   if(!name) return;
 
-  if(db.fields.some(f => f.name.toLowerCase() === name.toLowerCase())){
+  if(db.generations.some(g => (g.name||"").toLowerCase() === name.toLowerCase())){
     showAlert("bad","اسم الجيل موجود مسبقًا");
     return;
   }
-  db.fields.push({ id: uid("g"), name, desc });
+  db.generations.push({ id: uid("g"), name, desc });
   saveDB(db);
   showAlert("ok","تم إضافة الجيل ✅");
   route();
 }
 
-function delField(id){
-  if(!confirm("حذف الجيل سيحذف المهام والدروس والمستندات التابعة له. متابعة؟")) return;
+function delGen(id){
+  if(!confirm("حذف الجيل سيحذف المهمات والمستندات التابعة له. متابعة؟")) return;
   const db = loadDB();
-  const tasks = db.courses.filter(c=>c.fieldId===id).map(c=>c.id);
-
-  db.docs = db.docs.filter(d => !tasks.includes(d.courseId));
-  db.lessons = db.lessons.filter(l => !tasks.includes(l.courseId));
-  db.courses = db.courses.filter(c => c.fieldId !== id);
-  db.fields = db.fields.filter(f => f.id !== id);
-
+  const tasks = db.tasks.filter(t=>t.genId===id).map(t=>t.id);
+  db.taskDocs = db.taskDocs.filter(d => !tasks.includes(d.taskId));
+  db.tasks = db.tasks.filter(t => t.genId !== id);
+  db.generations = db.generations.filter(g => g.id !== id);
   saveDB(db);
   showAlert("ok","تم حذف الجيل ✅");
   route();
 }
 
-function addCourse(){
+function addTask(){
   const db = loadDB();
-  const fieldId = $("#courseFieldId").value;
-  const title = ($("#courseTitle").value||"").trim();
-  const description = ($("#courseDesc").value||"").trim();
+  const genId = $("#taskGenId").value;
+  const title = ($("#taskTitle").value||"").trim();
+  const description = ($("#taskDesc").value||"").trim();
   if(!title) return;
 
-  db.courses.push({ id: uid("t"), fieldId, title, description });
+  db.tasks.push({ id: uid("t"), genId, title, description });
   saveDB(db);
   showAlert("ok","تم إضافة المهمة ✅");
   route();
 }
 
-function delCourse(id){
-  if(!confirm("حذف المهمة سيحذف الدروس والمستندات التابعة لها. متابعة؟")) return;
+function delTask(id){
+  if(!confirm("حذف المهمة سيحذف المستندات التابعة لها. متابعة؟")) return;
   const db = loadDB();
-  db.docs = db.docs.filter(d => d.courseId !== id);
-  db.lessons = db.lessons.filter(l => l.courseId !== id);
-  db.courses = db.courses.filter(c => c.id !== id);
+  db.taskDocs = db.taskDocs.filter(d => d.taskId !== id);
+  db.tasks = db.tasks.filter(t => t.id !== id);
   saveDB(db);
   showAlert("ok","تم حذف المهمة ✅");
   route();
 }
 
-function addLesson(){
+/* --- Dependent dropdown for uploading docs: gen -> tasks --- */
+function refreshDocTasks(){
   const db = loadDB();
-  const courseId = $("#lessonCourseId").value;
-  const title = ($("#lessonTitle").value||"").trim();
-  const contentHtml = ($("#lessonHtml").value||"").trim() || "<p>محتوى الدرس…</p>";
-  if(!title) return;
+  const genId = $("#docGenId")?.value;
+  const sel = $("#docTaskId");
+  if(!sel) return;
 
-  db.lessons.push({ id: uid("lesson"), courseId, title, contentHtml, createdAt: Date.now() });
-  saveDB(db);
-  showAlert("ok","تم إضافة الدرس ✅");
-  route();
+  const tasks = db.tasks.filter(t=>t.genId === genId);
+  sel.innerHTML = tasks.length
+    ? tasks.map(t=>`<option value="${t.id}">${esc(t.title)}</option>`).join("")
+    : `<option value="">لا يوجد مهمات لهذا الجيل</option>`;
 }
 
-function delLesson(id){
-  if(!confirm("حذف الدرس؟")) return;
+function addTaskDoc(){
   const db = loadDB();
-  db.lessons = db.lessons.filter(l => l.id !== id);
-  saveDB(db);
-  showAlert("ok","تم حذف الدرس ✅");
-  route();
-}
-
-function addDoc(){
+  const taskId = $("#docTaskId").value;
+  const displayName = ($("#docDisplayName").value||"").trim();
   const fileInput = $("#docFile");
   const file = fileInput.files?.[0];
+
+  if(!taskId){ showAlert("bad","اختر مهمة صحيحة"); return; }
+  if(!displayName){ showAlert("bad","اكتب اسم المستند"); return; }
   if(!file){ showAlert("bad","اختر ملفًا"); return; }
 
   if(file.size > 3 * 1024 * 1024){
     if(!confirm("الملف أكبر من 3MB وقد لا يُحفظ. متابعة؟")) return;
   }
 
-  const courseId = $("#docCourseId").value;
-  const displayName = ($("#docName").value||"").trim();
-  if(!displayName){ showAlert("bad","اكتب اسمًا للمستند"); return; }
-
   const reader = new FileReader();
   reader.onload = () => {
     const dataUrl = reader.result;
-    const db = loadDB();
-
-    db.docs.push({
+    db.taskDocs.push({
       id: uid("doc"),
-      courseId,
+      taskId,
       displayName,
       filename: file.name,
       mime: file.type || "application/octet-stream",
@@ -1144,28 +1187,28 @@ function addDoc(){
 
     try{
       saveDB(db);
-      showAlert("ok","تم رفع المستند ✅ (محليًا)");
+      showAlert("ok","تم رفع المستند ✅");
       route();
     }catch(e){
-      showAlert("bad","فشل الحفظ: مساحة LocalStorage امتلأت. جرّب ملف أصغر.");
+      showAlert("bad","فشل الحفظ: LocalStorage امتلأ. جرّب ملف أصغر.");
     }
   };
   reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
   reader.readAsDataURL(file);
 }
 
-function delDoc(id){
+function delTaskDoc(id){
   if(!confirm("حذف المستند؟")) return;
   const db = loadDB();
-  db.docs = db.docs.filter(d => d.id !== id);
+  db.taskDocs = db.taskDocs.filter(d => d.id !== id);
   saveDB(db);
   showAlert("ok","تم حذف المستند ✅");
   route();
 }
 
-function downloadDoc(id){
+function downloadTaskDoc(id){
   const db = loadDB();
-  const doc = dbFind(db,"docs",id);
+  const doc = dbFind(db, "taskDocs", id);
   if(!doc){ showAlert("bad","المستند غير موجود"); return; }
   const a = document.createElement("a");
   a.href = doc.dataUrl;
@@ -1173,6 +1216,91 @@ function downloadDoc(id){
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+/* ---------- Python lesson draft ---------- */
+let PY_DRAFT = [];
+
+function resetDraftUI(){
+  PY_DRAFT = [];
+  const cnt = $("#draftCount");
+  const prev = $("#draftPreview");
+  if(cnt) cnt.textContent = "0 شريحة";
+  if(prev) prev.innerHTML = "";
+}
+
+function addSlideToDraft(){
+  const title = ($("#pySlideTitle").value||"").trim();
+  const bulletsText = ($("#pySlideBullets").value||"").trim();
+  const code = ($("#pySlideCodeOneLine").value||"").trim();
+
+  if(!title){ showAlert("bad","اكتب عنوان الشريحة"); return; }
+
+  const bullets = bulletsText
+    ? bulletsText.split("\n").map(x=>x.trim()).filter(Boolean)
+    : [];
+
+  PY_DRAFT.push({ title, bullets, code });
+
+  // clear slide fields (keep lesson title)
+  $("#pySlideTitle").value = "";
+  $("#pySlideBullets").value = "";
+  $("#pySlideCodeOneLine").value = "";
+
+  renderDraftPreview();
+}
+
+function renderDraftPreview(){
+  const cnt = $("#draftCount");
+  const prev = $("#draftPreview");
+  if(cnt) cnt.textContent = `${PY_DRAFT.length} شريحة`;
+  if(!prev) return;
+
+  prev.innerHTML = PY_DRAFT.map((s,idx)=>`
+    <div class="item">
+      <div>
+        <div class="title">${idx+1}. ${esc(s.title)}</div>
+        <div class="sub">${(s.bullets||[]).length} نقاط ${s.code ? "• مع كود" : ""}</div>
+      </div>
+      <div class="meta">
+        <button class="btn small danger" type="button" onclick="removeDraftSlide(${idx})">حذف</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function removeDraftSlide(i){
+  PY_DRAFT.splice(i,1);
+  renderDraftPreview();
+}
+
+function addPythonLesson(){
+  const db = loadDB();
+  const title = ($("#pyTitle").value||"").trim();
+  if(!title){ showAlert("bad","اكتب عنوان الدرس"); return; }
+  if(PY_DRAFT.length === 0){ showAlert("bad","لازم تضيف على الأقل شريحة واحدة"); return; }
+
+  db.pythonLessons.push({
+    id: uid("py"),
+    title,
+    slides: PY_DRAFT.slice(),
+    createdAt: Date.now()
+  });
+
+  saveDB(db);
+  showAlert("ok","تم حفظ درس بايثون ✅");
+  $("#pyTitle").value = "";
+  resetDraftUI();
+  route();
+}
+
+function delPythonLesson(id){
+  if(!confirm("حذف درس بايثون؟")) return;
+  const db = loadDB();
+  db.pythonLessons = db.pythonLessons.filter(l => l.id !== id);
+  saveDB(db);
+  showAlert("ok","تم حذف الدرس ✅");
+  route();
 }
 
 /* ---------- Boot ---------- */
