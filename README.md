@@ -98,6 +98,8 @@
     textarea{min-height:120px; resize:vertical}
     input:focus, textarea:focus, select:focus{border-color:#98a6ff; box-shadow: 0 0 0 4px rgba(13,57,255,.12)}
     .help{font-size:12px; color:var(--muted)}
+    .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width:720px){ .split{grid-template-columns:1fr} }
 
     .alert{
       padding:10px 12px; border-radius:12px;
@@ -176,16 +178,15 @@ firebase.initializeApp(FIREBASE_CONFIG);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ======================= الأدمن ======================= */
-const ADMIN_EMAIL = "bahaahajaj@btec.com"; // ✅ إيميل الأدمن
-// ⚠️ ملاحظة: الباسورد لا يُكتب في الكود. تستعمله فقط عند تسجيل الدخول.
-const ADMIN_PASSWORD_INFO = "bahaahajaj0775135361btec2007";
+/* ======================= الأدمن (فقط إيميل) ======================= */
+const ADMIN_EMAIL = "bahaahajaj@btec.com";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
 const esc = (s="") => String(s)
   .replaceAll("&","&amp;").replaceAll("<","&lt;")
-  .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
   .replaceAll("'","&#039;");
 
 function showAlert(type, msg){
@@ -198,6 +199,7 @@ function showAlert(type, msg){
 function hideAlert(){ $("#alertBox").classList.add("hide"); }
 function go(hash){ location.hash = hash; }
 
+/* ---------- Auth state ---------- */
 let CURRENT_USER = null;
 
 function isAdmin(){
@@ -232,13 +234,15 @@ function route(){
   if(p === "search") return renderSearch();
   if(p === "login") return renderLogin();
   if(p === "admin") return renderAdmin();
+
   renderHome();
 }
 
-/* ======================= Firestore Model =======================
-   pythonLessons: { title, createdAt }
-   pythonLessons/{lessonId}/slides: { title, bullets[], code, order, createdAt }
-================================================================= */
+/* ======================= بيانات Firestore =======================
+   collections:
+   - pythonLessons: { title, createdAt }
+   - pythonLessons/{lessonId}/slides: { title, bullets[], code, order, createdAt }
+*/
 
 /* ---------- HOME ---------- */
 async function renderHome(){
@@ -260,15 +264,15 @@ async function renderHome(){
         </div>
       </div>
       <div class="muted">
-        ${CURRENT_USER ? `أنت مسجل دخول` : `الطلاب ما يحتاجون دخول. الأدمن فقط للدروس.`}
+        ${CURRENT_USER ? `أنت مسجل دخول: <b>${esc(CURRENT_USER.email||"")}</b>` : `إذا أنت الأدمن: سجّل دخول حتى تضيف الدروس.`}
       </div>
     </div>
 
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <div class="h2">تعلم دروس بايثون من تحت صفر (Python)</div>
-          <div class="muted">تضاف من لوحة التحكم وتظهر للطلاب تلقائيًا.</div>
+          <div class="h2">آخر الدروس</div>
+          <div class="muted">تضاف من لوحة التحكم.</div>
         </div>
       </div>
       <div class="list">
@@ -303,7 +307,7 @@ async function renderPython(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">دروس بايثون</h1>
-          <div class="muted">دروس برسنتيشن تظهر لكل الطلاب تلقائيًا.</div>
+          <div class="muted">دروس على شكل برسنتيشن (شرائح).</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
@@ -320,7 +324,7 @@ async function renderPython(){
                 <button class="btn small" onclick="go('#/pythonLesson/${l.id}')">فتح</button>
               </div>
             </div>
-          `).join("") : `<div class="muted">لا يوجد دروس بعد.</div>`
+          `).join("") : `<div class="muted">لا يوجد دروس بعد. (الأدمن يضيف من لوحة التحكم)</div>`
         }
       </div>
     </div>
@@ -384,14 +388,14 @@ function renderSearch(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">بحث</h1>
-          <div class="muted">بحث داخل عناوين الدروس.</div>
+          <div class="muted">بحث داخل عناوين الدروس فقط.</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
 
       <div class="form">
         <label>اكتب كلمة البحث</label>
-        <input id="q" placeholder="مثال: VS Code / print / متغير" oninput="doSearch()">
+        <input id="q" placeholder="مثال: متغيرات / print / VS Code" oninput="doSearch()">
       </div>
 
       <div id="searchResults" class="grid" style="margin-top:14px"></div>
@@ -449,22 +453,22 @@ function renderLogin(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">تسجيل الدخول</h1>
-          <div class="muted">الدخول فقط للأدمن لإضافة الدروس.</div>
+          <div class="muted">الدخول فقط للأدمن حتى يضيف الدروس.</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
 
       <form class="form" onsubmit="event.preventDefault(); doLogin();">
         <label>الإيميل</label>
-        <input id="email" type="email" value="${esc(ADMIN_EMAIL)}" required>
+        <input id="email" type="email" placeholder="bahaahajaj@btec.com" required>
 
         <label>كلمة المرور</label>
-        <input id="pass" type="password" placeholder="اكتب كلمة المرور" required>
+        <input id="pass" type="password" placeholder="*****" required>
 
         <button class="btn" type="submit">دخول</button>
 
         <div class="help">
-          الطلاب ما يحتاجون تسجيل دخول.
+          ملاحظة: كلمة المرور ما تنكتب بالكود. لازم تكون موجودة داخل Firebase Auth.
         </div>
       </form>
     </div>
@@ -484,7 +488,7 @@ async function doLogin(){
     showAlert("ok","تم تسجيل الدخول ✅");
     go("#/admin");
   }catch(e){
-    showAlert("bad","فشل تسجيل الدخول. تأكد من الإيميل وكلمة المرور.");
+    showAlert("bad","فشل تسجيل الدخول. تأكد من الإيميل وكلمة المرور داخل Firebase Auth.");
   }
 }
 
@@ -523,7 +527,8 @@ async function renderAdmin(){
 
       <div class="alert ok">
         <div>
-          <b>تم تسجيل دخول الأدمن:</b> ${esc(CURRENT_USER.email||"")}
+          <b>الأدمن:</b> ${esc(CURRENT_USER.email||"")}
+          <div class="muted">الطلاب لا يحتاجون تسجيل دخول للقراءة.</div>
         </div>
       </div>
     </div>
@@ -561,7 +566,7 @@ async function renderAdmin(){
             <button class="btn ok" type="button" onclick="savePythonLessonOnline()">حفظ الدرس (أونلاين)</button>
           </div>
 
-          <div class="help">بعد ما تضيف كل الشرائح اضغط حفظ.</div>
+          <div class="help">نصيحة: اعمل 5-10 شرائح للدرس، وبعدها احفظ.</div>
           <div id="draftPreview" class="list" style="margin-top:10px"></div>
         </form>
       </div>
@@ -607,7 +612,10 @@ function addSlideToDraft(){
   const bulletsText = ($("#pySlideBullets").value||"").trim();
   const code = ($("#pySlideCodeOneLine").value||"").trim();
 
-  if(!title){ showAlert("bad","اكتب عنوان الشريحة"); return; }
+  if(!title){
+    showAlert("bad","اكتب عنوان الشريحة");
+    return;
+  }
 
   const bullets = bulletsText ? bulletsText.split("\n").map(x=>x.trim()).filter(Boolean) : [];
   PY_DRAFT.push({ title, bullets, code });
@@ -693,7 +701,6 @@ async function deleteLessonOnline(id){
 
 /* ---------- Boot ---------- */
 window.addEventListener("hashchange", route);
-
 auth.onAuthStateChanged((u)=>{
   CURRENT_USER = u || null;
   renderNav();
