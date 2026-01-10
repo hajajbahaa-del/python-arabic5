@@ -1,9 +1,9 @@
-
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>منصة تعلم البرمجة - مهندس بهاء</title>
+  <title>منصة BTEC - مهندس بهاء حجيج</title>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
@@ -51,9 +51,8 @@
     .brand b{font-size:16px}
     .brand span{font-size:12px; opacity:.9}
 
-    .nav{
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-    }
+    .nav{display:flex; flex-wrap:wrap; gap:8px; align-items:center;}
+
     .btn{
       border:0; cursor:pointer; font-family:inherit;
       padding:10px 12px; border-radius:12px;
@@ -176,14 +175,6 @@
       opacity:.9;
       font-size:13px;
     }
-
-    /* tiny link buttons */
-    .linkBtn{
-      background:transparent; border:0; cursor:pointer;
-      color:var(--primary); font-weight:900; padding:0;
-      text-decoration:underline;
-      font-family:inherit;
-    }
   </style>
 </head>
 
@@ -192,8 +183,8 @@
   <div class="topbar">
     <div class="inner">
       <a class="brand" href="#/">
-        <b>(BTEC) تعلم برمجة مع مهندس بهاء حجيج </b>
-        <span>منصة دروس + مستندات طلاب btec (2008/2009/2010)</span>
+        <b>(BTEC) منصة مهندس بهاء حجيج</b>
+        <span>أجيال 2008 / 2009 / 2010 • مهام + مستندات + دروس يومية</span>
       </a>
 
       <div class="nav">
@@ -207,42 +198,31 @@
   </div>
 
   <div class="wrap">
-
     <div id="alertBox" class="alert hide"></div>
 
-    <!-- HOME -->
     <div id="page-home" class="grid hide"></div>
-
-    <!-- COURSE -->
     <div id="page-course" class="hide"></div>
-
-    <!-- LESSON -->
     <div id="page-lesson" class="hide"></div>
-
-    <!-- SEARCH -->
     <div id="page-search" class="hide"></div>
-
-    <!-- LOGIN -->
     <div id="page-login" class="hide"></div>
-
-    <!-- ADMIN -->
     <div id="page-admin" class="hide"></div>
 
     <div class="footer">
-      © منصة تعليم البرمجة – إعداد مهندس بهاء | Instagram: <b>btec_zone.2_008</b>
+      © منصة BTEC – إعداد مهندس بهاء | Instagram: <b>btec_zone.2_008</b>
     </div>
   </div>
 
 <script>
 /* ============================================================================
-   Single-file "Platform" (LocalStorage)
-   - Fields -> Courses -> Lessons -> Documents
-   - Admin CRUD (add only + delete)
-   - Login (local)
+   Single-file Platform (LocalStorage)
+   - Generation (fields) -> Tasks (courses) -> Lessons -> Documents
+   - Admin CRUD
+   - Login + Save last lesson per user
 ============================================================================ */
 
-const LS_KEY = "btec_platform_v1";
-const SESSION_KEY = "btec_session_v1";
+const LS_KEY = "btec_platform_v2";
+const SESSION_KEY = "btec_session_v2";
+const PROGRESS_KEY = "btec_progress_v2";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
@@ -278,6 +258,27 @@ function logout(){
   go("#/");
 }
 
+/* ---------- Progress (last lesson) ---------- */
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); }
+  catch{ return {}; }
+}
+function saveProgress(p){ localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+
+function setUserLastLesson(lessonId){
+  const s = getSession();
+  if(!s) return;
+  const p = loadProgress();
+  p[s.id] = { lastLessonId: lessonId, updatedAt: Date.now() };
+  saveProgress(p);
+}
+function getUserLastLesson(){
+  const s = getSession();
+  if(!s) return null;
+  const p = loadProgress();
+  return p[s.id] || null;
+}
+
 /* ---------- Data Model ---------- */
 function seedData(){
   return {
@@ -285,30 +286,25 @@ function seedData(){
       { id:"u_admin", username:"admin", password:"admin12345", role:"admin", name:"Admin" },
       { id:"u_student", username:"student", password:"1234", role:"student", name:"Student" }
     ],
+    // الأجيال
     fields: [
-      { id:"f_py", name:"Python", desc:"شرح بايثون خطوة بخطوة بالعربي" }
+      { id:"g_2008", name:"جيل 2008", desc:"مهام ومستندات خاصة بطلاب 2008" },
+      { id:"g_2009", name:"جيل 2009", desc:"مهام ومستندات خاصة بطلاب 2009" },
+      { id:"g_2010", name:"جيل 2010", desc:"مهام ومستندات خاصة بطلاب 2010" }
     ],
+    // المهام (تُستخدم مكان courses)
     courses: [
-      { id:"c_py_1", fieldId:"f_py", title:"أساسيات بايثون", description:"من الصفر حتى أول مشروع" }
+      { id:"t_2008_1", fieldId:"g_2008", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
+      { id:"t_2009_1", fieldId:"g_2009", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" },
+      { id:"t_2010_1", fieldId:"g_2010", title:"مهمة 1", description:"ارفع مستندات المهمة هنا" }
     ],
     lessons: [
-      { id:"l_py_1", courseId:"c_py_1", title:"اليوم الأول: print والمتغيرات",
-        contentHtml: `
-          <h2>بداية تعلم بايثون</h2>
-          <p>في هذا الدرس سنتعرف على <code>print</code> والمتغيرات.</p>
-          <h3>مثال</h3>
-          <pre>print("مرحبا")</pre>
-          <p>المتغير:</p>
-          <pre>name = "Ali"
-print(name)</pre>
-        `,
+      { id:"lesson_1", courseId:"t_2008_1", title:"درس 1 - اليوم الأول",
+        contentHtml:`<h2>درس 1</h2><p>ابدأ من هنا…</p>`,
         createdAt: Date.now()
       }
     ],
-    docs: [
-      // docs are stored as base64 in LocalStorage (not ideal for big files)
-      // { id, courseId, displayName, filename, mime, size, dataUrl, createdAt }
-    ]
+    docs: []
   };
 }
 
@@ -321,7 +317,6 @@ function loadDB(){
   }
   try{
     const d = JSON.parse(raw);
-    // minimal hardening
     if(!d.fields || !d.courses || !d.lessons || !d.docs || !d.users) throw new Error("bad");
     return d;
   }catch{
@@ -333,12 +328,8 @@ function loadDB(){
 function saveDB(db){ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
 
 /* ---------- Derived helpers ---------- */
-function dbFind(db, arrName, id){
-  return db[arrName].find(x => x.id === id);
-}
-function coursesByField(db, fieldId){
-  return db.courses.filter(c => c.fieldId === fieldId);
-}
+function dbFind(db, arrName, id){ return db[arrName].find(x => x.id === id); }
+function coursesByField(db, fieldId){ return db.courses.filter(c => c.fieldId === fieldId); }
 function lessonsByCourse(db, courseId){
   return db.lessons.filter(l => l.courseId === courseId).sort((a,b)=> (a.createdAt||0)-(b.createdAt||0));
 }
@@ -363,7 +354,6 @@ function hideAllPages(){
     $("#page-"+p).classList.add("hide");
   });
 }
-
 function route(){
   hideAlert();
   hideAllPages();
@@ -371,21 +361,15 @@ function route(){
   const hash = location.hash || "#/";
   const parts = hash.replace("#","").split("/").filter(Boolean);
 
-  // "#/" => []
-  if(parts.length === 0){
-    renderHome();
-    return;
-  }
+  if(parts.length === 0){ renderHome(); return; }
 
   const [p, id] = parts;
-
   if(p === "course" && id) return renderCourse(id);
   if(p === "lesson" && id) return renderLesson(id);
   if(p === "search") return renderSearch();
   if(p === "login") return renderLogin();
   if(p === "admin") return renderAdmin();
 
-  // fallback
   renderHome();
 }
 
@@ -395,50 +379,91 @@ function renderHome(){
   const root = $("#page-home");
   root.classList.remove("hide");
 
+  const last = getUserLastLesson();
+  const lastLesson = last?.lastLessonId ? dbFind(db,"lessons", last.lastLessonId) : null;
+
+  const latestLessons = db.lessons
+    .slice()
+    .sort((a,b)=> (b.createdAt||0)-(a.createdAt||0))
+    .slice(0, 7);
+
   root.innerHTML = `
     <div class="card" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
-          <h1 class="h1">الحقول</h1>
-          <div class="muted">اختر حقلًا ثم كورسًا ثم ابدأ بالدروس والملفات.</div>
+          <h1 class="h1">الأجيال</h1>
+          <div class="muted">اختر الجيل ثم افتح المهمة، وبعدها حمل ملفات المهمة أو اقرأ الدروس.</div>
         </div>
         <div class="row">
-          <span class="pill">RTL</span>
-          <span class="pill">ملف واحد</span>
-          <span class="pill">حفظ محلي</span>
+          <span class="pill">2008</span><span class="pill">2009</span><span class="pill">2010</span>
         </div>
       </div>
-      <div class="muted">
-        ملاحظة: هذه نسخة تعمل بدون سيرفر. لرفع ملفات “على الإنترنت” تحتاج Flask/Backend.
+
+      ${
+        lastLesson ? `
+          <div class="alert ok" style="margin-top:10px">
+            <div><b>أكمل من حيث توقفت:</b> ${esc(lastLesson.title)}</div>
+            <button class="btn small" onclick="go('#/lesson/${lastLesson.id}')">متابعة</button>
+          </div>
+        ` : `
+          <div class="muted">سجّل دخول عشان نحفظ آخر درس وصلت له.</div>
+        `
+      }
+    </div>
+
+    <div class="card soft" style="grid-column: 1/-1;">
+      <div class="cardHeader">
+        <div>
+          <div class="h2">الدروس اليومية (آخر الدروس)</div>
+          <div class="muted">كل يوم أضف درس جديد من لوحة التحكم وسيظهر هنا.</div>
+        </div>
+      </div>
+      <div class="list">
+        ${
+          latestLessons.length ? latestLessons.map(l=>{
+            const task = dbFind(db,"courses", l.courseId);
+            return `
+              <div class="item">
+                <div>
+                  <div class="title">${esc(l.title)}</div>
+                  <div class="sub">ضمن: ${esc(task?.title || "—")} • ${new Date(l.createdAt||Date.now()).toLocaleDateString("ar")}</div>
+                </div>
+                <div class="meta">
+                  <button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button>
+                </div>
+              </div>
+            `;
+          }).join("") : `<div class="muted">لا يوجد دروس بعد.</div>`
+        }
       </div>
     </div>
   `;
 
-  db.fields.forEach(f=>{
-    const cs = coursesByField(db, f.id);
+  db.fields.forEach(g=>{
+    const tasks = coursesByField(db, g.id);
     const html = `
       <div class="card">
         <div class="cardHeader">
           <div>
-            <div class="h2">${esc(f.name)}</div>
-            <div class="muted">${esc(f.desc || "")}</div>
+            <div class="h2">${esc(g.name)}</div>
+            <div class="muted">${esc(g.desc || "")}</div>
           </div>
-          <span class="pill">${cs.length} كورس</span>
+          <span class="pill">${tasks.length} مهمة</span>
         </div>
 
         <div class="list">
           ${
-            cs.length ? cs.map(c=>`
+            tasks.length ? tasks.map(t=>`
               <div class="item">
                 <div>
-                  <div class="title">${esc(c.title)}</div>
-                  <div class="sub">${esc(c.description || "")}</div>
+                  <div class="title">${esc(t.title)}</div>
+                  <div class="sub">${esc(t.description || "")}</div>
                 </div>
                 <div class="meta">
-                  <button class="btn small" onclick="go('#/course/${c.id}')">فتح</button>
+                  <button class="btn small" onclick="go('#/course/${t.id}')">فتح المهمة</button>
                 </div>
               </div>
-            `).join("") : `<div class="muted">لا يوجد كورسات بعد.</div>`
+            `).join("") : `<div class="muted">لا يوجد مهام بعد.</div>`
           }
         </div>
       </div>
@@ -447,14 +472,14 @@ function renderHome(){
   });
 }
 
-function renderCourse(courseId){
+function renderCourse(taskId){
   const db = loadDB();
-  const course = dbFind(db, "courses", courseId);
-  if(!course){ showAlert("bad","الكورس غير موجود"); return go("#/"); }
+  const task = dbFind(db, "courses", taskId);
+  if(!task){ showAlert("bad","المهمة غير موجودة"); return go("#/"); }
 
-  const field = dbFind(db, "fields", course.fieldId);
-  const lessons = lessonsByCourse(db, courseId);
-  const docs = docsByCourse(db, courseId);
+  const gen = dbFind(db, "fields", task.fieldId);
+  const lessons = lessonsByCourse(db, taskId);
+  const docs = docsByCourse(db, taskId);
 
   const root = $("#page-course");
   root.classList.remove("hide");
@@ -463,14 +488,14 @@ function renderCourse(courseId){
     <div class="card">
       <div class="cardHeader">
         <div>
-          <h1 class="h1">${esc(course.title)}</h1>
-          <div class="muted">الحقل: <b>${esc(field?.name || "-")}</b></div>
-          <div class="muted">${esc(course.description || "")}</div>
+          <h1 class="h1">${esc(task.title)}</h1>
+          <div class="muted">الجيل: <b>${esc(gen?.name || "-")}</b></div>
+          <div class="muted">${esc(task.description || "")}</div>
         </div>
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
           <span class="pill">${lessons.length} درس</span>
-          <span class="pill">${docs.length} ملف</span>
+          <span class="pill">${docs.length} مستند</span>
         </div>
       </div>
 
@@ -479,7 +504,7 @@ function renderCourse(courseId){
           <div class="cardHeader">
             <div>
               <div class="h2">الدروس</div>
-              <div class="muted">اضغط على أي درس لفتح الشرح.</div>
+              <div class="muted">اضغط على أي درس لفتحه.</div>
             </div>
           </div>
           <div class="list">
@@ -502,8 +527,8 @@ function renderCourse(courseId){
         <div class="card soft">
           <div class="cardHeader">
             <div>
-              <div class="h2">الملفات</div>
-              <div class="muted">تنزيل الملفات المرفقة بالكورس.</div>
+              <div class="h2">مستندات المهمة</div>
+              <div class="muted">حمّل المستندات المطلوبة للمهمة.</div>
             </div>
           </div>
           <div class="list">
@@ -518,14 +543,12 @@ function renderCourse(courseId){
                     <button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button>
                   </div>
                 </div>
-              `).join("") : `<div class="muted">لا يوجد ملفات بعد.</div>`
+              `).join("") : `<div class="muted">لا يوجد مستندات بعد.</div>`
             }
           </div>
 
           <div class="alert warn" style="margin-top:12px">
-            <div>
-              <b>تنبيه:</b> رفع الملفات هنا يُخزَّن داخل المتصفح (LocalStorage) وقد لا يناسب الملفات الكبيرة.
-            </div>
+            <div><b>تنبيه:</b> المستندات تُخزَّن محليًا داخل المتصفح (LocalStorage) وقد لا تناسب الملفات الكبيرة.</div>
             <button class="btn small dark" onclick="hideAlert()">حسنًا</button>
           </div>
         </div>
@@ -538,7 +561,11 @@ function renderLesson(lessonId){
   const db = loadDB();
   const lesson = dbFind(db, "lessons", lessonId);
   if(!lesson){ showAlert("bad","الدرس غير موجود"); return go("#/"); }
-  const course = dbFind(db, "courses", lesson.courseId);
+
+  // حفظ التقدم للمستخدم
+  setUserLastLesson(lessonId);
+
+  const task = dbFind(db, "courses", lesson.courseId);
 
   const root = $("#page-lesson");
   root.classList.remove("hide");
@@ -550,10 +577,10 @@ function renderLesson(lessonId){
           <div>
             <div class="bismillah">بسم الله الرحمن الرحيم</div>
             <div class="lessonTitle">${esc(lesson.title)}</div>
-            <div style="opacity:.92; margin-top:6px">الكورس: <b>${esc(course?.title || "-")}</b></div>
+            <div style="opacity:.92; margin-top:6px">المهمة: <b>${esc(task?.title || "-")}</b></div>
           </div>
           <div class="row">
-            <button class="btn ghost" onclick="go('#/course/${lesson.courseId}')">رجوع للكورس</button>
+            <button class="btn ghost" onclick="go('#/course/${lesson.courseId}')">رجوع للمهمة</button>
             <button class="btn ghost" onclick="go('#/')">الرئيسية</button>
           </div>
         </div>
@@ -574,21 +601,20 @@ function renderSearch(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">بحث</h1>
-          <div class="muted">ابحث داخل عناوين الحقول/الكورسات/الدروس/الملفات.</div>
+          <div class="muted">ابحث داخل الأجيال/المهام/الدروس/المستندات.</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
 
       <div class="form">
         <label>اكتب كلمة البحث</label>
-        <input id="q" placeholder="مثال: print / متغير / بايثون..." oninput="doSearch()">
+        <input id="q" placeholder="مثال: مهمة 1 / درس 2 ..." oninput="doSearch()">
       </div>
 
       <div id="searchResults" class="grid" style="margin-top:14px"></div>
     </div>
   `;
 
-  // initial
   doSearch();
 }
 
@@ -599,13 +625,10 @@ function doSearch(){
   if(!out) return;
 
   const hits = { fields:[], courses:[], lessons:[], docs:[] };
-
   const match = (s)=> (s||"").toLowerCase().includes(q);
 
   if(!q){
-    out.innerHTML = `<div class="card soft" style="grid-column:1/-1">
-      <div class="muted">اكتب كلمة للبحث…</div>
-    </div>`;
+    out.innerHTML = `<div class="card soft" style="grid-column:1/-1"><div class="muted">اكتب كلمة للبحث…</div></div>`;
     return;
   }
 
@@ -614,67 +637,51 @@ function doSearch(){
   db.lessons.forEach(l=>{ if(match(l.title) || match(l.contentHtml)) hits.lessons.push(l); });
   db.docs.forEach(d=>{ if(match(d.displayName) || match(d.filename)) hits.docs.push(d); });
 
-  const mk = (title, itemsHtml) => `
+  const mk = (title, items) => `
     <div class="card soft">
       <div class="cardHeader">
         <div class="h2">${title}</div>
-        <span class="pill">${itemsHtml.count || 0}</span>
+        <span class="pill">${items.length}</span>
       </div>
-      <div class="list">${itemsHtml.html || `<div class="muted">لا نتائج</div>`}</div>
+      <div class="list">${
+        items.length ? items.join("") : `<div class="muted">لا نتائج</div>`
+      }</div>
     </div>
   `;
 
-  const fieldsHtml = hits.fields.length ? hits.fields.map(f=>`
+  const fieldsHtml = hits.fields.map(f=>`
     <div class="item">
-      <div>
-        <div class="title">${esc(f.name)}</div>
-        <div class="sub">${esc(f.desc||"")}</div>
-      </div>
-      <div class="meta"><span class="pill">حقل</span></div>
+      <div><div class="title">${esc(f.name)}</div><div class="sub">${esc(f.desc||"")}</div></div>
+      <div class="meta"><span class="pill">جيل</span></div>
     </div>
-  `).join("") : "";
+  `);
 
-  const coursesHtml = hits.courses.length ? hits.courses.map(c=>`
+  const tasksHtml = hits.courses.map(t=>`
     <div class="item">
-      <div>
-        <div class="title">${esc(c.title)}</div>
-        <div class="sub">${esc(c.description||"")}</div>
-      </div>
-      <div class="meta">
-        <button class="btn small" onclick="go('#/course/${c.id}')">فتح</button>
-      </div>
+      <div><div class="title">${esc(t.title)}</div><div class="sub">${esc(t.description||"")}</div></div>
+      <div class="meta"><button class="btn small" onclick="go('#/course/${t.id}')">فتح</button></div>
     </div>
-  `).join("") : "";
+  `);
 
-  const lessonsHtml = hits.lessons.length ? hits.lessons.map(l=>`
+  const lessonsHtml = hits.lessons.map(l=>`
     <div class="item">
-      <div>
-        <div class="title">${esc(l.title)}</div>
-        <div class="sub">درس</div>
-      </div>
-      <div class="meta">
-        <button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button>
-      </div>
+      <div><div class="title">${esc(l.title)}</div><div class="sub">درس</div></div>
+      <div class="meta"><button class="btn small" onclick="go('#/lesson/${l.id}')">فتح</button></div>
     </div>
-  `).join("") : "";
+  `);
 
-  const docsHtml = hits.docs.length ? hits.docs.map(d=>`
+  const docsHtml = hits.docs.map(d=>`
     <div class="item">
-      <div>
-        <div class="title">${esc(d.displayName)}</div>
-        <div class="sub">${esc(d.filename)}</div>
-      </div>
-      <div class="meta">
-        <button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button>
-      </div>
+      <div><div class="title">${esc(d.displayName)}</div><div class="sub">${esc(d.filename)}</div></div>
+      <div class="meta"><button class="btn small ok" onclick="downloadDoc('${d.id}')">تنزيل</button></div>
     </div>
-  `).join("") : "";
+  `);
 
   out.innerHTML = `
-    ${mk("نتائج الحقول", {count:hits.fields.length, html:fieldsHtml})}
-    ${mk("نتائج الكورسات", {count:hits.courses.length, html:coursesHtml})}
-    ${mk("نتائج الدروس", {count:hits.lessons.length, html:lessonsHtml})}
-    ${mk("نتائج الملفات", {count:hits.docs.length, html:docsHtml})}
+    ${mk("نتائج الأجيال", fieldsHtml)}
+    ${mk("نتائج المهام", tasksHtml)}
+    ${mk("نتائج الدروس", lessonsHtml)}
+    ${mk("نتائج المستندات", docsHtml)}
   `;
 }
 
@@ -687,7 +694,7 @@ function renderLogin(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">تسجيل الدخول</h1>
-          <div class="muted">هذا تسجيل دخول محلي للتجربة داخل الملف فقط.</div>
+          <div class="muted">بعد الدخول نحفظ آخر درس وصلت له.</div>
         </div>
         <button class="btn ghost dark" onclick="go('#/')">رجوع</button>
       </div>
@@ -724,7 +731,7 @@ function doLogin(){
     return;
   }
   setSession({ id:user.id, username:user.username, role:user.role, name:user.name });
-  showAlert("ok", `تم تسجيل الدخول كـ ${user.role === "admin" ? "أدمن" : "طالب"} ✅`);
+  showAlert("ok", `تم تسجيل الدخول ✅`);
   go(user.role === "admin" ? "#/admin" : "#/");
 }
 
@@ -751,7 +758,7 @@ function renderAdmin(){
       <div class="cardHeader">
         <div>
           <h1 class="h1">لوحة التحكم</h1>
-          <div class="muted">إضافة/حذف حقول، كورسات، دروس، ملفات (محليًا).</div>
+          <div class="muted">إضافة/حذف: أجيال + مهام + دروس + مستندات (محليًا).</div>
         </div>
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
@@ -760,10 +767,10 @@ function renderAdmin(){
       </div>
 
       <div class="grid">
-        ${adminStatsCard("الحقول", db.fields.length)}
-        ${adminStatsCard("الكورسات", db.courses.length)}
+        ${adminStatsCard("الأجيال", db.fields.length)}
+        ${adminStatsCard("المهام", db.courses.length)}
         ${adminStatsCard("الدروس", db.lessons.length)}
-        ${adminStatsCard("الملفات", db.docs.length)}
+        ${adminStatsCard("المستندات", db.docs.length)}
       </div>
     </div>
 
@@ -771,15 +778,15 @@ function renderAdmin(){
       <div class="card">
         <div class="cardHeader">
           <div>
-            <div class="h2">إضافة حقل</div>
-            <div class="muted">مثل: Python / Web / AI</div>
+            <div class="h2">إضافة جيل</div>
+            <div class="muted">مثال: جيل 2008</div>
           </div>
         </div>
         <form class="form" onsubmit="event.preventDefault(); addField();">
-          <label>اسم الحقل</label>
-          <input id="fieldName" placeholder="مثال: Python" required>
+          <label>اسم الجيل</label>
+          <input id="fieldName" placeholder="جيل 2011" required>
           <label>وصف مختصر</label>
-          <input id="fieldDesc" placeholder="شرح بسيط عن الحقل">
+          <input id="fieldDesc" placeholder="وصف للجيل">
           <button class="btn" type="submit">إضافة</button>
         </form>
 
@@ -801,19 +808,19 @@ function renderAdmin(){
       <div class="card">
         <div class="cardHeader">
           <div>
-            <div class="h2">إضافة كورس</div>
-            <div class="muted">يرتبط بحقل.</div>
+            <div class="h2">إضافة مهمة</div>
+            <div class="muted">المهمة مرتبطة بجيل.</div>
           </div>
         </div>
         <form class="form" onsubmit="event.preventDefault(); addCourse();">
-          <label>الحقل</label>
+          <label>الجيل</label>
           <select id="courseFieldId" required>
             ${db.fields.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join("")}
           </select>
-          <label>عنوان الكورس</label>
-          <input id="courseTitle" placeholder="أساسيات بايثون" required>
+          <label>عنوان المهمة</label>
+          <input id="courseTitle" placeholder="مهمة 2" required>
           <label>وصف مختصر</label>
-          <input id="courseDesc" placeholder="من الصفر حتى أول مشروع">
+          <input id="courseDesc" placeholder="مطلوب: …">
           <button class="btn" type="submit">إضافة</button>
         </form>
 
@@ -840,24 +847,23 @@ function renderAdmin(){
         <div class="cardHeader">
           <div>
             <div class="h2">إضافة درس</div>
-            <div class="muted">اكتب الشرح (HTML) أو نص مع أكواد داخل &lt;pre&gt;.</div>
+            <div class="muted">اختَر المهمة ثم اكتب محتوى الدرس.</div>
           </div>
         </div>
 
         <form class="form" onsubmit="event.preventDefault(); addLesson();">
-          <label>الكورس</label>
+          <label>المهمة</label>
           <select id="lessonCourseId" required>
             ${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}
           </select>
 
           <label>عنوان الدرس</label>
-          <input id="lessonTitle" placeholder="اليوم الأول: print والمتغيرات" required>
+          <input id="lessonTitle" placeholder="درس 2 - اليوم الثاني" required>
 
           <label>محتوى الدرس (HTML)</label>
           <textarea id="lessonHtml" placeholder="<h2>عنوان</h2><p>شرح...</p><pre>print(&quot;Hello&quot;)</pre>"></textarea>
 
-          <div class="help">نصيحة: لعرض كود استخدم <b>&lt;pre&gt;...&lt;/pre&gt;</b></div>
-
+          <div class="help">للكود استخدم: <b>&lt;pre&gt;...&lt;/pre&gt;</b></div>
           <button class="btn" type="submit">إضافة</button>
         </form>
 
@@ -883,25 +889,25 @@ function renderAdmin(){
       <div class="card">
         <div class="cardHeader">
           <div>
-            <div class="h2">رفع ملف</div>
-            <div class="muted">يرتبط بكورس (محليًا). مناسب للملفات الصغيرة.</div>
+            <div class="h2">رفع مستند لمهمة</div>
+            <div class="muted">يرتبط بمهمة (محليًا).</div>
           </div>
         </div>
 
         <form class="form" onsubmit="event.preventDefault(); addDoc();">
-          <label>الكورس</label>
+          <label>المهمة</label>
           <select id="docCourseId" required>
             ${db.courses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join("")}
           </select>
 
           <label>اسم يظهر للطلاب</label>
-          <input id="docName" placeholder="مثال: ملزمة اليوم الأول PDF" required>
+          <input id="docName" placeholder="مستند مهمة 1 - PDF" required>
 
           <label>اختر الملف</label>
           <input id="docFile" type="file" required>
 
           <button class="btn" type="submit">رفع</button>
-          <div class="help">الملف يُخزَّن في المتصفح وقد لا يعمل للملفات الكبيرة.</div>
+          <div class="help">مناسب للملفات الصغيرة (LocalStorage).</div>
         </form>
 
         <div style="margin-top:12px" class="list">
@@ -939,6 +945,7 @@ function adminStatsCard(title, num){
 function resetAll(){
   if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
   localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(PROGRESS_KEY);
   showAlert("ok","تمت إعادة الضبط");
   route();
 }
@@ -950,27 +957,27 @@ function addField(){
   if(!name) return;
 
   if(db.fields.some(f => f.name.toLowerCase() === name.toLowerCase())){
-    showAlert("bad","اسم الحقل موجود مسبقًا");
+    showAlert("bad","اسم الجيل موجود مسبقًا");
     return;
   }
-  db.fields.push({ id: uid("f"), name, desc });
+  db.fields.push({ id: uid("g"), name, desc });
   saveDB(db);
-  showAlert("ok","تم إضافة الحقل ✅");
+  showAlert("ok","تم إضافة الجيل ✅");
   route();
 }
 
 function delField(id){
-  if(!confirm("حذف الحقل سيحذف الكورسات والدروس والملفات التابعة له. متابعة؟")) return;
+  if(!confirm("حذف الجيل سيحذف المهام والدروس والمستندات التابعة له. متابعة؟")) return;
   const db = loadDB();
+  const tasks = db.courses.filter(c=>c.fieldId===id).map(c=>c.id);
 
-  const courses = db.courses.filter(c=>c.fieldId===id).map(c=>c.id);
-  db.docs = db.docs.filter(d => !courses.includes(d.courseId));
-  db.lessons = db.lessons.filter(l => !courses.includes(l.courseId));
+  db.docs = db.docs.filter(d => !tasks.includes(d.courseId));
+  db.lessons = db.lessons.filter(l => !tasks.includes(l.courseId));
   db.courses = db.courses.filter(c => c.fieldId !== id);
   db.fields = db.fields.filter(f => f.id !== id);
 
   saveDB(db);
-  showAlert("ok","تم حذف الحقل ✅");
+  showAlert("ok","تم حذف الجيل ✅");
   route();
 }
 
@@ -981,20 +988,20 @@ function addCourse(){
   const description = ($("#courseDesc").value||"").trim();
   if(!title) return;
 
-  db.courses.push({ id: uid("c"), fieldId, title, description });
+  db.courses.push({ id: uid("t"), fieldId, title, description });
   saveDB(db);
-  showAlert("ok","تم إضافة الكورس ✅");
+  showAlert("ok","تم إضافة المهمة ✅");
   route();
 }
 
 function delCourse(id){
-  if(!confirm("هل تريد حذف الكورس؟ سيتم حذف الدروس والملفات التابعة له.")) return;
+  if(!confirm("حذف المهمة سيحذف الدروس والمستندات التابعة لها. متابعة؟")) return;
   const db = loadDB();
   db.docs = db.docs.filter(d => d.courseId !== id);
   db.lessons = db.lessons.filter(l => l.courseId !== id);
   db.courses = db.courses.filter(c => c.id !== id);
   saveDB(db);
-  showAlert("ok","تم حذف الكورس ✅");
+  showAlert("ok","تم حذف المهمة ✅");
   route();
 }
 
@@ -1005,7 +1012,7 @@ function addLesson(){
   const contentHtml = ($("#lessonHtml").value||"").trim() || "<p>محتوى الدرس…</p>";
   if(!title) return;
 
-  db.lessons.push({ id: uid("l"), courseId, title, contentHtml, createdAt: Date.now() });
+  db.lessons.push({ id: uid("lesson"), courseId, title, contentHtml, createdAt: Date.now() });
   saveDB(db);
   showAlert("ok","تم إضافة الدرس ✅");
   route();
@@ -1023,30 +1030,23 @@ function delLesson(id){
 function addDoc(){
   const fileInput = $("#docFile");
   const file = fileInput.files?.[0];
-  if(!file){
-    showAlert("bad","اختر ملفًا");
-    return;
-  }
+  if(!file){ showAlert("bad","اختر ملفًا"); return; }
 
-  // Warning: LocalStorage is limited. We'll store as dataURL; best for small files.
   if(file.size > 3 * 1024 * 1024){
-    if(!confirm("الملف أكبر من 3MB وقد لا يُحفظ في المتصفح. متابعة؟")) return;
+    if(!confirm("الملف أكبر من 3MB وقد لا يُحفظ. متابعة؟")) return;
   }
 
   const courseId = $("#docCourseId").value;
   const displayName = ($("#docName").value||"").trim();
-  if(!displayName){
-    showAlert("bad","اكتب اسمًا للملف");
-    return;
-  }
+  if(!displayName){ showAlert("bad","اكتب اسمًا للمستند"); return; }
 
   const reader = new FileReader();
   reader.onload = () => {
-    const dataUrl = reader.result; // base64
+    const dataUrl = reader.result;
     const db = loadDB();
 
     db.docs.push({
-      id: uid("d"),
+      id: uid("doc"),
       courseId,
       displayName,
       filename: file.name,
@@ -1058,10 +1058,10 @@ function addDoc(){
 
     try{
       saveDB(db);
-      showAlert("ok","تم رفع الملف ✅ (محليًا)");
+      showAlert("ok","تم رفع المستند ✅ (محليًا)");
       route();
     }catch(e){
-      showAlert("bad","فشل الحفظ: المتصفح امتلأ (LocalStorage limit). جرّب ملف أصغر.");
+      showAlert("bad","فشل الحفظ: مساحة LocalStorage امتلأت. جرّب ملف أصغر.");
     }
   };
   reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
@@ -1069,20 +1069,18 @@ function addDoc(){
 }
 
 function delDoc(id){
-  if(!confirm("حذف الملف؟")) return;
+  if(!confirm("حذف المستند؟")) return;
   const db = loadDB();
   db.docs = db.docs.filter(d => d.id !== id);
   saveDB(db);
-  showAlert("ok","تم حذف الملف ✅");
+  showAlert("ok","تم حذف المستند ✅");
   route();
 }
 
 function downloadDoc(id){
   const db = loadDB();
   const doc = dbFind(db,"docs",id);
-  if(!doc){ showAlert("bad","الملف غير موجود"); return; }
-
-  // Create downloadable link
+  if(!doc){ showAlert("bad","المستند غير موجود"); return; }
   const a = document.createElement("a");
   a.href = doc.dataUrl;
   a.download = doc.filename || "file";
