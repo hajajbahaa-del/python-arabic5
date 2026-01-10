@@ -193,7 +193,7 @@
     <div class="inner">
       <a class="brand" href="#/">
         <b>تعلم برمجة مع مهندس بهاء</b>
-        <span>منصة دروس + ملفات (نسخة ملف واحد)</span>
+        <span>منصة دروس + مستندات طلاب btec (2008/2009/2010)</span>
       </a>
 
       <div class="nav">
