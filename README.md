@@ -192,7 +192,7 @@
   <div class="topbar">
     <div class="inner">
       <a class="brand" href="#/">
-        <b>(BTEC) تعلم برمجة مع مهندس بهاء</b>
+        <b>(BTEC) تعلم برمجة مع مهندس بهاء حجيج </b>
         <span>منصة دروس + مستندات طلاب btec (2008/2009/2010)</span>
       </a>
 
