@@ -30,6 +30,7 @@
       min-height:100vh;
     }
 
+    /* top bar */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
@@ -68,6 +69,7 @@
     .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
     .btn.link{background:transparent;color:var(--primary);text-decoration:underline;padding:0;border-radius:0}
 
+    /* layout */
     .wrap{max-width:1100px; margin:18px auto; padding:0 14px}
     .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:14px}
     .card{
@@ -96,6 +98,7 @@
     }
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
 
+    /* list items */
     .list{display:flex; flex-direction:column; gap:10px}
     .item{
       padding:12px; border-radius:14px;
@@ -108,6 +111,7 @@
     .item .sub{font-size:13px; color:var(--muted); margin-top:2px}
     .item .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
+    /* forms */
     .form{display:flex; flex-direction:column; gap:10px}
     label{font-size:13px; font-weight:900; color:#344054}
     input, textarea, select{
@@ -125,6 +129,7 @@
     .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 720px){ .split{grid-template-columns:1fr} }
 
+    /* alerts */
     .alert{
       padding:10px 12px; border-radius:12px;
       border:1px solid var(--line);
@@ -136,6 +141,7 @@
     .alert.warn{border-color:#fedf89; background:#fffaeb}
     .hide{display:none !important}
 
+    /* presentation lesson */
     .lessonWrap{
       background:#fff; color:#111;
       border-radius: 18px; overflow:hidden;
@@ -226,9 +232,8 @@ const SESSION_KEY = "btec_session_v4";
 const DEVICE_KEY = "btec_device_v1";
 const PROGRESS_KEY = "btec_progress_v4";
 
-/* ✅✅✅ جديد: رابط ملف الدروس/النسخة الاحتياطية على نفس الموقع
-   ارفع btec-backup.json بجانب index.html */
-const BACKUP_FILE_URL = "./btec-backup.json";
+/* ✅ ملف الدروس الذي ترفعه بجانب index.html على الاستضافة */
+const BACKUP_FILE_URL = "btec-backup.json";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
@@ -448,15 +453,14 @@ function renderHome(){
       ${lastHtml}
     </div>
 
-    <!-- ✅✅✅ الجديد: ملف الدروس في الرئيسية + ملاحظة -->
+    <!-- ✅✅✅ (بدل رسالة 📌) : ملف الدروس -->
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
           <div class="h2">📌 مهم: لإظهار الدروس على أي جهاز</div>
           <div class="muted">
-            المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.
-            <br>
-            <b>إذا ما ظهرت الدروس عندك:</b> اضغط استيراد (تلقائي أو يدوي) مرة واحدة.
+            المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.<br>
+            إذا ما ظهرت الدروس عندك: ارفع ملف الدروس مرة واحدة.
           </div>
         </div>
       </div>
@@ -464,16 +468,10 @@ function renderHome(){
       <div class="row">
         <a class="btn ok" href="${BACKUP_FILE_URL}" download>تحميل ملف الدروس</a>
 
-        <button class="btn" type="button" onclick="importFromURL()">استيراد تلقائي من الموقع</button>
-
         <label class="btn ghost" style="cursor:pointer;">
-          استيراد يدوي (من الجهاز)
+          رفع / استيراد ملف الدروس
           <input type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
         </label>
-      </div>
-
-      <div class="help" style="margin-top:8px">
-        ملاحظة للأدمن: لازم ترفع ملف <b>btec-backup.json</b> بجانب <b>index.html</b> على الاستضافة.
       </div>
     </div>
 
@@ -892,11 +890,9 @@ function renderAdmin(){
           <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
         </div>
 
-        <!-- ✅✅ تم إضافة تصدير/استيراد هنا -->
+        <!-- ✅✅✅ تم حذف زر تصدير البيانات + حذف زر الاستيراد التلقائي -->
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
-
-          <button class="btn ok" onclick="exportDB()">تصدير البيانات</button>
 
           <label class="btn ghost" style="cursor:pointer;">
             استيراد البيانات
@@ -1164,6 +1160,7 @@ function delTask(id){
   route();
 }
 
+/* --- Dependent dropdown for uploading docs: gen -> tasks --- */
 function refreshDocTasks(){
   const db = loadDB();
   const genId = $("#docGenId")?.value;
@@ -1238,6 +1235,7 @@ function downloadTaskDoc(id){
   a.remove();
 }
 
+/* ---------- Python lesson draft ---------- */
 let PY_DRAFT = [];
 
 function resetDraftUI(){
@@ -1292,6 +1290,7 @@ function removeDraftSlide(i){
   renderDraftPreview();
 }
 
+/* ✅ حفظ الدرس */
 function addPythonLesson(){
   const db = loadDB();
 
@@ -1345,22 +1344,8 @@ function delPythonLesson(id){
 }
 
 /* ============================================================================
-   ✅✅✅ التعديل: تصدير/استيراد قاعدة البيانات بدون سيرفر
+   ✅ استيراد قاعدة البيانات (يدوي فقط)
 ============================================================================ */
-
-function exportDB(){
-  const db = loadDB();
-  const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "btec-backup.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(a.href);
-  showAlert("ok","تم تصدير ملف النسخة الاحتياطية ✅");
-}
-
 function importDB(file){
   if(!file) return;
   if(!confirm("استيراد البيانات سيستبدل البيانات الحالية على هذا الجهاز. متابعة؟")) return;
@@ -1384,29 +1369,6 @@ function importDB(file){
   };
   reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
   reader.readAsText(file, "utf-8");
-}
-
-/* ✅✅✅ جديد: استيراد تلقائي من ملف موجود على نفس الموقع بدون اختيار ملف */
-async function importFromURL(){
-  try{
-    if(!confirm("سيتم استيراد البيانات من الموقع واستبدال بيانات هذا الجهاز. متابعة؟")) return;
-
-    const res = await fetch(BACKUP_FILE_URL, { cache: "no-store" });
-    if(!res.ok) throw new Error("HTTP " + res.status);
-
-    const data = await res.json();
-
-    if(!data || !data.users || !data.generations || !data.tasks || !data.taskDocs || !data.pythonLessons){
-      showAlert("bad","ملف الموقع غير صالح أو ناقص بيانات.");
-      return;
-    }
-
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-    showAlert("ok","تم الاستيراد تلقائيًا من الموقع ✅");
-    route();
-  }catch(e){
-    showAlert("bad","فشل الاستيراد التلقائي. تأكد أن ملف btec-backup.json مرفوع بجانب index.html");
-  }
 }
 
 /* ---------- Boot ---------- */
