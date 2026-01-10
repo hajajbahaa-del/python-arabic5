@@ -30,7 +30,6 @@
       min-height:100vh;
     }
 
-    /* top bar */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
@@ -54,6 +53,8 @@
       background:#fff; color:var(--primary);
       font-weight:800;
       transition:.15s transform ease, .15s opacity ease;
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px;
     }
     .btn:hover{transform: translateY(-1px); opacity:.95}
     .btn.ghost{
@@ -67,7 +68,6 @@
     .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
     .btn.link{background:transparent;color:var(--primary);text-decoration:underline;padding:0;border-radius:0}
 
-    /* layout */
     .wrap{max-width:1100px; margin:18px auto; padding:0 14px}
     .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:14px}
     .card{
@@ -96,7 +96,6 @@
     }
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
 
-    /* list items */
     .list{display:flex; flex-direction:column; gap:10px}
     .item{
       padding:12px; border-radius:14px;
@@ -109,7 +108,6 @@
     .item .sub{font-size:13px; color:var(--muted); margin-top:2px}
     .item .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
-    /* forms */
     .form{display:flex; flex-direction:column; gap:10px}
     label{font-size:13px; font-weight:900; color:#344054}
     input, textarea, select{
@@ -127,7 +125,6 @@
     .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 720px){ .split{grid-template-columns:1fr} }
 
-    /* alerts */
     .alert{
       padding:10px 12px; border-radius:12px;
       border:1px solid var(--line);
@@ -139,7 +136,6 @@
     .alert.warn{border-color:#fedf89; background:#fffaeb}
     .hide{display:none !important}
 
-    /* presentation lesson */
     .lessonWrap{
       background:#fff; color:#111;
       border-radius: 18px; overflow:hidden;
@@ -862,8 +858,18 @@ function renderAdmin(){
           <h1 class="h1">لوحة التحكم</h1>
           <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
         </div>
+
+        <!-- ✅✅ تم إضافة تصدير/استيراد هنا -->
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
+
+          <button class="btn ok" onclick="exportDB()">تصدير البيانات</button>
+
+          <label class="btn ghost" style="cursor:pointer;">
+            استيراد البيانات
+            <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
+          </label>
+
           <button class="btn danger" onclick="resetAll()">إعادة ضبط البيانات</button>
         </div>
       </div>
@@ -1004,7 +1010,6 @@ function renderAdmin(){
           </div>
         </div>
 
-        <!-- ✅ فورم بدون submit حقيقي + زر حفظ Button -->
         <form class="form" onsubmit="event.preventDefault(); return false;">
           <label>عنوان الدرس</label>
           <input id="pyTitle" placeholder="مثال: المتغيرات في بايثون" required>
@@ -1126,7 +1131,6 @@ function delTask(id){
   route();
 }
 
-/* --- Dependent dropdown for uploading docs: gen -> tasks --- */
 function refreshDocTasks(){
   const db = loadDB();
   const genId = $("#docGenId")?.value;
@@ -1201,7 +1205,6 @@ function downloadTaskDoc(id){
   a.remove();
 }
 
-/* ---------- Python lesson draft ---------- */
 let PY_DRAFT = [];
 
 function resetDraftUI(){
@@ -1256,7 +1259,6 @@ function removeDraftSlide(i){
   renderDraftPreview();
 }
 
-/* ✅ الإصلاح النهائي: حفظ الدرس بدون مشاكل required */
 function addPythonLesson(){
   const db = loadDB();
 
@@ -1307,6 +1309,48 @@ function delPythonLesson(id){
   saveDB(db);
   showAlert("ok","تم حذف الدرس ✅");
   route();
+}
+
+/* ============================================================================
+   ✅✅✅ التعديل الجديد: تصدير/استيراد قاعدة البيانات بدون سيرفر
+============================================================================ */
+
+function exportDB(){
+  const db = loadDB();
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "btec-backup.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  showAlert("ok","تم تصدير ملف النسخة الاحتياطية ✅");
+}
+
+function importDB(file){
+  if(!file) return;
+  if(!confirm("استيراد البيانات سيستبدل البيانات الحالية على هذا الجهاز. متابعة؟")) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+
+      if(!data || !data.users || !data.generations || !data.tasks || !data.taskDocs || !data.pythonLessons){
+        showAlert("bad","الملف غير صالح أو ناقص بيانات.");
+        return;
+      }
+
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      showAlert("ok","تم استيراد البيانات ✅");
+      route();
+    }catch(e){
+      showAlert("bad","فشل الاستيراد: الملف ليس JSON صحيح.");
+    }
+  };
+  reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
+  reader.readAsText(file, "utf-8");
 }
 
 /* ---------- Boot ---------- */
