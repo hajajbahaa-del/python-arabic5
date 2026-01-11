@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -54,6 +55,7 @@
       transition:.15s transform ease, .15s opacity ease;
       display:inline-flex; align-items:center; justify-content:center;
       gap:8px;
+      text-decoration:none;
     }
     .btn:hover{transform: translateY(-1px); opacity:.95}
     .btn.ghost{
@@ -65,7 +67,6 @@
     .btn.ok{background: #d1fadf; color:#027a48}
     .btn.dark{background:#101828; color:#fff}
     .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
-    .btn.link{background:transparent;color:var(--primary);text-decoration:underline;padding:0;border-radius:0}
 
     .wrap{max-width:1100px; margin:18px auto; padding:0 14px}
     .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:14px}
@@ -162,12 +163,6 @@
       overflow:auto; direction:ltr; text-align:left;
       margin:10px 0 0;
     }
-    .slide code{
-      background:#111827; color:#d1fae5;
-      padding:2px 6px; border-radius:8px;
-      direction:ltr;
-    }
-
     .footer{
       margin:20px 0 30px;
       text-align:center;
@@ -217,61 +212,13 @@
 
 <script>
 /* ============================================================================
-   Single-file Platform (LocalStorage)
+   Single-file Platform (LocalStorage Only) — GitHub Pages Friendly
 ============================================================================ */
 
 const LS_KEY = "btec_platform_v4";
 const SESSION_KEY = "btec_session_v4";
 const DEVICE_KEY = "btec_device_v1";
 const PROGRESS_KEY = "btec_progress_v4";
-
-/* ============================================================================
-   ✅✅✅ ملف الدروس داخل الكود (بدون أي ملفات على الاستضافة)
-   زر "تحميل ملف الدروس" رح ينشئ btec-backup.json وينزله.
-============================================================================ */
-const EMBEDDED_BACKUP_DB = {
-  "users":[{"id":"u_admin","username":"bahaa_hajaj","password":"bahaahajaj0775135361n","role":"admin","name":"Baha Admin","deviceId":"*"}],
-  "generations":[{"id":"g_2008","name":"جيل 2008","desc":""},{"id":"g_2009","name":"جيل 2009","desc":""},{"id":"g_2010","name":"جيل 2010","desc":""}],
-  "tasks":[],
-  "taskDocs":[],
-  "pythonLessons":[
-    {
-      "id":"py_591b4f7bc84b4819ba907771f",
-      "title":"الدرس 0: تجهيز الكمبيوتر للبرمجة (تنزيل البرامج)",
-      "slides":[
-        {"title":"ليش لازم نجهز الكمبيوتر؟","bullets":["قبل ما نبرمج لازم نجهز الكمبيوتر","البرمجة تحتاج برامج خاصة","بدون البرامج الكود ما بيشتغل","اليوم رح نجهز كل شي خطوة خطوة"],"code":""},
-        {"title":"ما هي البرامج اللي رح نستخدمها؟","bullets":["VS Code برنامج نكتب فيه الكود","Python هي لغة البرمجة نفسها","VS Code بدون Python ما بشتغل","Python بدون VS Code صعب نستخدمه"],"code":""},
-        {"title":"تنزيل برنامج VS Code","bullets":["افتح متصفح الإنترنت","اكتب في البحث تحميل VS Code","ادخل أول موقع من Microsoft","اضغط على زر Download"],"code":""},
-        {"title":"تثبيت VS Code على الكمبيوتر","bullets":["بعد ما ينزل الملف افتحه","اضغط Next أكثر من مرة","وافق على الشروط","اضغط Install","انتظر حتى يخلص التثبيت"],"code":""},
-        {"title":"فتح VS Code لأول مرة","bullets":["افتح برنامج VS Code","رح تشوف شاشة فيها ملفات وأزرار","لا تخاف الشكل سهل","رح نتعلمه خطوة خطوة"],"code":""},
-        {"title":"تنزيل لغة بايثون Python","bullets":["افتح المتصفح","اكتب تحميل Python","ادخل الموقع الرسمي python.org","اضغط Download Python"],"code":""},
-        {"title":"تثبيت Python (خطوة مهمة جدًا)","bullets":["افتح ملف تثبيت Python","فعل خيار Add Python to PATH","هذه خطوة مهمة جدًا","بعدها اضغط Install Now"],"code":""},
-        {"title":"التأكد أن Python اشتغل","bullets":["افتح Start","اكتب cmd","اكتب الأمر python --version","إذا ظهر رقم معناها تمام"],"code":""},
-        {"title":"ربط Python مع VS Code","bullets":["افتح VS Code","اضغط على Extensions من اليسار","ابحث عن Python","ثبت إضافة Python من Microsoft"],"code":""},
-        {"title":"جاهزين نبدأ البرمجة","bullets":["VS Code جاهز","Python جاهز","الكمبيوتر جاهز","من الدرس القادم نكتب أول كود بايثون"],"code":""}
-      ],
-      "createdAt":1768067397407
-    },
-    {
-      "id":"py_d94c96e8ce84e819ba91e77ba",
-      "title":"درس 1 - أول خطوة في بايثون (للمبتدئ جدًا)",
-      "slides":[
-        {"title":"شو يعني كود؟","bullets":["الكود هو تعليمات نكتبها للكمبيوتر.","كل سطر كود يعني أمر واحد.","الكمبيوتر يقرأ الأوامر من فوق لتحت.","إذا كتبنا الكود غلط، الكمبيوتر ما يفهم.","عشان هيك لازم نكتب الكود بدقة."],"code":""},
-        {"title":"شو يعني لغة برمجة؟","bullets":["لغة البرمجة هي لغة خاصة نحكي فيها مع الكمبيوتر.","زي ما في عربي وإنجليزي، في لغة اسمها بايثون.","الكمبيوتر ما بفهم عربي، بفهم بايثون.","بايثون سهلة ومناسبة للمبتدئين.","عشان هيك اخترنا نبدأ فيها."],"code":""},
-        {"title":"كيف نكتب كود بايثون؟","bullets":["نكتب الكود داخل برنامج VS Code.","كل كود نكتبه داخل ملف اسمه ينتهي بـ .py","مثال: lesson2.py","أي ملف بايثون لازم يكون بهذا الشكل.","بدون .py الكمبيوتر ما يعرف إنه بايثون."],"code":""},
-        {"title":"أول أمر في بايثون: print","bullets":["أول أمر نتعلمه اسمه print.","print معناها: اطبع على الشاشة.","نستخدمها عشان نشوف نتيجة الكود.","أي نص نطبعه لازم يكون بين علامتي تنصيص \" \"."
-        ],"code":""},
-        {"title":"مثال على أمر print","bullets":["لما نكتب:","print(\"مرحبا\")","الكمبيوتر يطبع كلمة مرحبا.","إذا غيرنا النص، يطبع النص الجديد.","هذا الأمر مهم جدًا لأنه نستخدمه دايمًا."],"code":""},
-        {"title":"تشغيل الكود خطوة خطوة","bullets":["بعد ما نكتب الكود:","لازم نحفظ الملف (Ctrl + S).","بعدين نشغل الملف من VS Code.","إذا طلع النص على الشاشة → الكود شغال صح.","إذا ما طلع → في خطأ لازم نصلحه."],"code":""},
-        {"title":"شو يعني خطأ (Error)؟","bullets":["الخطأ يعني الكمبيوتر مش فاهم الكود.","أحيانًا ننسى حرف.","أحيانًا ننسى علامة تنصيص.","الكمبيوتر يطلع رسالة خطأ.","رسالة الخطأ بتساعدنا نعرف وين الغلط."],"code":""},
-        {"title":"أكثر أخطاء شائعة للمبتدئ","bullets":["نسيان علامات التنصيص \" \".","نسيان القوس ) أو (.","كتابة print بدون أقواس.","نسيان حفظ الملف قبل التشغيل.","كل هاي أشياء طبيعية للمبتدئ."],"code":""},
-        {"title":"أول تجربة للطالب","bullets":["الطالب يفتح VS Code.","يعمل ملف جديد اسمه lesson2.py.","يكتب أكثر من أمر print.","يشغل الكود ويشوف النتيجة.","يجرب يغير النص ويشوف الفرق."],"code":""},
-        {"title":"واجب بسيط (مهم جدًا)","bullets":["اعمل ملف اسمه homework2.py","واكتب فيه:","اطبع اسمك.","اطبع صفك أو جيلك.","اطبع جملة تقول فيها إنك بلشت تتعلم برمجة.","شغل الملف وتأكد إنه شغال."],"code":""}
-      ],
-      "createdAt":1768068904890
-    }
-  ]
-};
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
@@ -375,6 +322,43 @@ function loadDB(){
 }
 function saveDB(db){ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
 
+/* ---------- Backup (Download/Import) — NO extra files on GitHub ---------- */
+function exportDBToFile(){
+  const db = loadDB();
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "btec-backup.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  showAlert("ok","تم تنزيل ملف الدروس (btec-backup.json) ✅");
+}
+
+function importDB(file){
+  if(!file) return;
+  if(!confirm("استيراد البيانات سيستبدل البيانات الحالية على هذا الجهاز. متابعة؟")) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data || !data.users || !data.generations || !data.tasks || !data.taskDocs || !data.pythonLessons){
+        showAlert("bad","الملف غير صالح أو ناقص بيانات.");
+        return;
+      }
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      showAlert("ok","تم استيراد البيانات ✅");
+      route();
+    }catch(e){
+      showAlert("bad","فشل الاستيراد: الملف ليس JSON صحيح.");
+    }
+  };
+  reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
+  reader.readAsText(file, "utf-8");
+}
+
 /* ---------- Helpers ---------- */
 function normalizeU(u){ return (u||"").trim().toLowerCase(); }
 function dbFind(db, arr, id){ return db[arr].find(x => x.id === id); }
@@ -457,26 +441,6 @@ function route(){
   renderHome();
 }
 
-/* ============================================================================
-   ✅ زر تحميل ملف الدروس (ينشئ ملف JSON ويعمل Download)
-============================================================================ */
-function downloadLessonsFile(){
-  try{
-    const content = JSON.stringify(EMBEDDED_BACKUP_DB, null, 2);
-    const blob = new Blob([content], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "btec-backup.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
-    showAlert("ok","تم تنزيل ملف الدروس ✅");
-  }catch(e){
-    showAlert("bad","تعذر تنزيل ملف الدروس.");
-  }
-}
-
 /* ---------- Pages ---------- */
 function renderHome(){
   const db = loadDB();
@@ -511,25 +475,29 @@ function renderHome(){
       ${lastHtml}
     </div>
 
-    <!-- ✅✅✅ مكان ملاحظة 📌 + زر تحميل/رفع ملف الدروس -->
+    <!-- ✅✅✅ مربع الملف في الصفحة الرئيسية (بدون أي ملفات مرفوعة على GitHub) -->
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
           <div class="h2">📌 مهم: لإظهار الدروس على أي جهاز</div>
           <div class="muted">
             المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.<br>
-            إذا ما ظهرت الدروس عندك: حمّل ملف الدروس وارفعة مرة واحدة على جهازك.
+            إذا ما ظهرت الدروس عندك: اضغط <b>رفع / استيراد ملف الدروس</b> مرة واحدة.
           </div>
         </div>
       </div>
 
       <div class="row">
-        <button class="btn ok" onclick="downloadLessonsFile()">تحميل ملف الدروس</button>
+        <button class="btn ok" onclick="exportDBToFile()">تحميل ملف الدروس</button>
 
         <label class="btn ghost" style="cursor:pointer;">
           رفع / استيراد ملف الدروس
           <input type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
         </label>
+      </div>
+
+      <div class="help" style="margin-top:10px">
+        ملاحظة: الملف يتم تنزيله من البيانات الموجودة عند الأدمن (على جهازه). ثم الطلاب يرفعوه عندهم.
       </div>
     </div>
 
@@ -946,7 +914,7 @@ function renderAdmin(){
           <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
         </div>
 
-        <!-- ✅✅✅ حذف زر تصدير البيانات + لا يوجد استيراد تلقائي -->
+        <!-- ✅ تم حذف زر (تصدير البيانات) نهائيًا -->
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
 
@@ -1125,7 +1093,7 @@ function renderAdmin(){
         </form>
 
         <div style="margin-top:12px" class="list">
-          ${pythonLessonsSorted(db).slice(0,10).map(l=>`
+          ${(pythonLessonsSorted(db).slice(0,10)).map(l=>`
             <div class="item">
               <div>
                 <div class="title">${esc(l.title)}</div>
@@ -1156,7 +1124,6 @@ function adminStatsCard(title, num){
   `;
 }
 
-/* ---------- Admin actions ---------- */
 function resetAll(){
   if(!confirm("هل تريد إعادة ضبط كل البيانات؟")) return;
   localStorage.removeItem(LS_KEY);
@@ -1290,7 +1257,7 @@ function downloadTaskDoc(id){
   a.remove();
 }
 
-/* ---------- Python draft ---------- */
+/* ---------- Python lesson draft ---------- */
 let PY_DRAFT = [];
 
 function resetDraftUI(){
@@ -1395,34 +1362,6 @@ function delPythonLesson(id){
   saveDB(db);
   showAlert("ok","تم حذف الدرس ✅");
   route();
-}
-
-/* ============================================================================
-   ✅ استيراد قاعدة البيانات (يدوي)
-============================================================================ */
-function importDB(file){
-  if(!file) return;
-  if(!confirm("استيراد البيانات سيستبدل البيانات الحالية على هذا الجهاز. متابعة؟")) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const data = JSON.parse(reader.result);
-
-      if(!data || !data.users || !data.generations || !data.tasks || !data.taskDocs || !data.pythonLessons){
-        showAlert("bad","الملف غير صالح أو ناقص بيانات.");
-        return;
-      }
-
-      localStorage.setItem(LS_KEY, JSON.stringify(data));
-      showAlert("ok","تم استيراد البيانات ✅");
-      route();
-    }catch(e){
-      showAlert("bad","فشل الاستيراد: الملف ليس JSON صحيح.");
-    }
-  };
-  reader.onerror = () => showAlert("bad","تعذر قراءة الملف");
-  reader.readAsText(file, "utf-8");
 }
 
 /* ---------- Boot ---------- */
