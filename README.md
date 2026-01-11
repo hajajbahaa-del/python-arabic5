@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -223,7 +224,7 @@
 
 <script>
 /* ============================================================================
-   Single-file Platform (LocalStorage)
+   Single-file Platform (LocalStorage) - نسخة بدون سيرفر
 ============================================================================ */
 
 const LS_KEY = "btec_platform_v4";
@@ -236,11 +237,14 @@ const BACKUP_FILE_URL = "btec-backup.json";
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
+
+/* ✅✅ esc بدون replaceAll (يدعم الأجهزة القديمة) */
 const esc = (s="") => String(s)
-  .replaceAll("&","&amp;").replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;")
+  .replace(/'/g,"&#039;");
 
 function uid(prefix="id"){
   return prefix + "_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
@@ -255,6 +259,30 @@ function showAlert(type, msg){
 }
 function hideAlert(){ $("#alertBox").classList.add("hide"); }
 function go(hash){ location.hash = hash; }
+
+/* ✅✅ تحميل ملف الدروس بأمان (حتى لا ينزل HTML إذا الملف مش موجود) */
+async function safeDownloadBackup(){
+  try{
+    const r = await fetch(BACKUP_FILE_URL, { cache: "no-store" });
+    if(!r.ok){
+      showAlert("bad","ملف الدروس غير موجود على الموقع. ارفع btec-backup.json بجانب index.html");
+      return;
+    }
+    const ct = (r.headers.get("content-type") || "").toLowerCase();
+    if(!ct.includes("application/json") && !ct.includes("text/json")){
+      showAlert("bad","الملف الموجود ليس JSON (يبدو صفحة HTML). تأكد أنك رفعت btec-backup.json الصحيح.");
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = BACKUP_FILE_URL;
+    a.download = "btec-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }catch(e){
+    showAlert("bad","فشل تحميل ملف الدروس. تحقق من الرابط/الانترنت.");
+  }
+}
 
 /* ---------- Session ---------- */
 function getSession(){
@@ -452,20 +480,20 @@ function renderHome(){
       ${lastHtml}
     </div>
 
-    <!-- ✅✅✅ (بدل رسالة 📌) : ملف الدروس -->
+    <!-- ✅✅✅ بطاقة ملف الدروس (بدل الرسالة القديمة + بدون استيراد تلقائي) -->
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
           <div class="h2">📌 مهم: لإظهار الدروس على أي جهاز</div>
           <div class="muted">
             المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.<br>
-            إذا ما ظهرت الدروس عندك: ارفع ملف الدروس مرة واحدة.
+            إذا ما ظهرت الدروس عندك: ارفع/استيراد ملف الدروس مرة واحدة.
           </div>
         </div>
       </div>
 
       <div class="row">
-        <a class="btn ok" href="${BACKUP_FILE_URL}" download>تحميل ملف الدروس</a>
+        <button class="btn ok" onclick="safeDownloadBackup()">تحميل ملف الدروس</button>
 
         <label class="btn ghost" style="cursor:pointer;">
           رفع / استيراد ملف الدروس
