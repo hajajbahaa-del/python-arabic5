@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8"/>
@@ -30,7 +29,6 @@
       min-height:100vh;
     }
 
-    /* top bar */
     .topbar{
       position:sticky; top:0; z-index:50;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
@@ -69,7 +67,6 @@
     .btn.small{padding:8px 10px; border-radius:10px; font-weight:800; font-size:13px}
     .btn.link{background:transparent;color:var(--primary);text-decoration:underline;padding:0;border-radius:0}
 
-    /* layout */
     .wrap{max-width:1100px; margin:18px auto; padding:0 14px}
     .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap:14px}
     .card{
@@ -98,7 +95,6 @@
     }
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
 
-    /* list items */
     .list{display:flex; flex-direction:column; gap:10px}
     .item{
       padding:12px; border-radius:14px;
@@ -111,7 +107,6 @@
     .item .sub{font-size:13px; color:var(--muted); margin-top:2px}
     .item .meta{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
 
-    /* forms */
     .form{display:flex; flex-direction:column; gap:10px}
     label{font-size:13px; font-weight:900; color:#344054}
     input, textarea, select{
@@ -129,7 +124,6 @@
     .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 720px){ .split{grid-template-columns:1fr} }
 
-    /* alerts */
     .alert{
       padding:10px 12px; border-radius:12px;
       border:1px solid var(--line);
@@ -141,7 +135,6 @@
     .alert.warn{border-color:#fedf89; background:#fffaeb}
     .hide{display:none !important}
 
-    /* presentation lesson */
     .lessonWrap{
       background:#fff; color:#111;
       border-radius: 18px; overflow:hidden;
@@ -224,7 +217,7 @@
 
 <script>
 /* ============================================================================
-   Single-file Platform (LocalStorage) - نسخة بدون سيرفر
+   Single-file Platform (LocalStorage)
 ============================================================================ */
 
 const LS_KEY = "btec_platform_v4";
@@ -232,19 +225,61 @@ const SESSION_KEY = "btec_session_v4";
 const DEVICE_KEY = "btec_device_v1";
 const PROGRESS_KEY = "btec_progress_v4";
 
-/* ✅ ملف الدروس الذي ترفعه بجانب index.html على الاستضافة */
-const BACKUP_FILE_URL = "btec-backup.json";
+/* ============================================================================
+   ✅✅✅ ملف الدروس داخل الكود (بدون أي ملفات على الاستضافة)
+   زر "تحميل ملف الدروس" رح ينشئ btec-backup.json وينزله.
+============================================================================ */
+const EMBEDDED_BACKUP_DB = {
+  "users":[{"id":"u_admin","username":"bahaa_hajaj","password":"bahaahajaj0775135361n","role":"admin","name":"Baha Admin","deviceId":"*"}],
+  "generations":[{"id":"g_2008","name":"جيل 2008","desc":""},{"id":"g_2009","name":"جيل 2009","desc":""},{"id":"g_2010","name":"جيل 2010","desc":""}],
+  "tasks":[],
+  "taskDocs":[],
+  "pythonLessons":[
+    {
+      "id":"py_591b4f7bc84b4819ba907771f",
+      "title":"الدرس 0: تجهيز الكمبيوتر للبرمجة (تنزيل البرامج)",
+      "slides":[
+        {"title":"ليش لازم نجهز الكمبيوتر؟","bullets":["قبل ما نبرمج لازم نجهز الكمبيوتر","البرمجة تحتاج برامج خاصة","بدون البرامج الكود ما بيشتغل","اليوم رح نجهز كل شي خطوة خطوة"],"code":""},
+        {"title":"ما هي البرامج اللي رح نستخدمها؟","bullets":["VS Code برنامج نكتب فيه الكود","Python هي لغة البرمجة نفسها","VS Code بدون Python ما بشتغل","Python بدون VS Code صعب نستخدمه"],"code":""},
+        {"title":"تنزيل برنامج VS Code","bullets":["افتح متصفح الإنترنت","اكتب في البحث تحميل VS Code","ادخل أول موقع من Microsoft","اضغط على زر Download"],"code":""},
+        {"title":"تثبيت VS Code على الكمبيوتر","bullets":["بعد ما ينزل الملف افتحه","اضغط Next أكثر من مرة","وافق على الشروط","اضغط Install","انتظر حتى يخلص التثبيت"],"code":""},
+        {"title":"فتح VS Code لأول مرة","bullets":["افتح برنامج VS Code","رح تشوف شاشة فيها ملفات وأزرار","لا تخاف الشكل سهل","رح نتعلمه خطوة خطوة"],"code":""},
+        {"title":"تنزيل لغة بايثون Python","bullets":["افتح المتصفح","اكتب تحميل Python","ادخل الموقع الرسمي python.org","اضغط Download Python"],"code":""},
+        {"title":"تثبيت Python (خطوة مهمة جدًا)","bullets":["افتح ملف تثبيت Python","فعل خيار Add Python to PATH","هذه خطوة مهمة جدًا","بعدها اضغط Install Now"],"code":""},
+        {"title":"التأكد أن Python اشتغل","bullets":["افتح Start","اكتب cmd","اكتب الأمر python --version","إذا ظهر رقم معناها تمام"],"code":""},
+        {"title":"ربط Python مع VS Code","bullets":["افتح VS Code","اضغط على Extensions من اليسار","ابحث عن Python","ثبت إضافة Python من Microsoft"],"code":""},
+        {"title":"جاهزين نبدأ البرمجة","bullets":["VS Code جاهز","Python جاهز","الكمبيوتر جاهز","من الدرس القادم نكتب أول كود بايثون"],"code":""}
+      ],
+      "createdAt":1768067397407
+    },
+    {
+      "id":"py_d94c96e8ce84e819ba91e77ba",
+      "title":"درس 1 - أول خطوة في بايثون (للمبتدئ جدًا)",
+      "slides":[
+        {"title":"شو يعني كود؟","bullets":["الكود هو تعليمات نكتبها للكمبيوتر.","كل سطر كود يعني أمر واحد.","الكمبيوتر يقرأ الأوامر من فوق لتحت.","إذا كتبنا الكود غلط، الكمبيوتر ما يفهم.","عشان هيك لازم نكتب الكود بدقة."],"code":""},
+        {"title":"شو يعني لغة برمجة؟","bullets":["لغة البرمجة هي لغة خاصة نحكي فيها مع الكمبيوتر.","زي ما في عربي وإنجليزي، في لغة اسمها بايثون.","الكمبيوتر ما بفهم عربي، بفهم بايثون.","بايثون سهلة ومناسبة للمبتدئين.","عشان هيك اخترنا نبدأ فيها."],"code":""},
+        {"title":"كيف نكتب كود بايثون؟","bullets":["نكتب الكود داخل برنامج VS Code.","كل كود نكتبه داخل ملف اسمه ينتهي بـ .py","مثال: lesson2.py","أي ملف بايثون لازم يكون بهذا الشكل.","بدون .py الكمبيوتر ما يعرف إنه بايثون."],"code":""},
+        {"title":"أول أمر في بايثون: print","bullets":["أول أمر نتعلمه اسمه print.","print معناها: اطبع على الشاشة.","نستخدمها عشان نشوف نتيجة الكود.","أي نص نطبعه لازم يكون بين علامتي تنصيص \" \"."
+        ],"code":""},
+        {"title":"مثال على أمر print","bullets":["لما نكتب:","print(\"مرحبا\")","الكمبيوتر يطبع كلمة مرحبا.","إذا غيرنا النص، يطبع النص الجديد.","هذا الأمر مهم جدًا لأنه نستخدمه دايمًا."],"code":""},
+        {"title":"تشغيل الكود خطوة خطوة","bullets":["بعد ما نكتب الكود:","لازم نحفظ الملف (Ctrl + S).","بعدين نشغل الملف من VS Code.","إذا طلع النص على الشاشة → الكود شغال صح.","إذا ما طلع → في خطأ لازم نصلحه."],"code":""},
+        {"title":"شو يعني خطأ (Error)؟","bullets":["الخطأ يعني الكمبيوتر مش فاهم الكود.","أحيانًا ننسى حرف.","أحيانًا ننسى علامة تنصيص.","الكمبيوتر يطلع رسالة خطأ.","رسالة الخطأ بتساعدنا نعرف وين الغلط."],"code":""},
+        {"title":"أكثر أخطاء شائعة للمبتدئ","bullets":["نسيان علامات التنصيص \" \".","نسيان القوس ) أو (.","كتابة print بدون أقواس.","نسيان حفظ الملف قبل التشغيل.","كل هاي أشياء طبيعية للمبتدئ."],"code":""},
+        {"title":"أول تجربة للطالب","bullets":["الطالب يفتح VS Code.","يعمل ملف جديد اسمه lesson2.py.","يكتب أكثر من أمر print.","يشغل الكود ويشوف النتيجة.","يجرب يغير النص ويشوف الفرق."],"code":""},
+        {"title":"واجب بسيط (مهم جدًا)","bullets":["اعمل ملف اسمه homework2.py","واكتب فيه:","اطبع اسمك.","اطبع صفك أو جيلك.","اطبع جملة تقول فيها إنك بلشت تتعلم برمجة.","شغل الملف وتأكد إنه شغال."],"code":""}
+      ],
+      "createdAt":1768068904890
+    }
+  ]
+};
 
 /* ---------- Utilities ---------- */
 const $ = (sel) => document.querySelector(sel);
-
-/* ✅✅ esc بدون replaceAll (يدعم الأجهزة القديمة) */
 const esc = (s="") => String(s)
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#039;");
+  .replaceAll("&","&amp;").replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
 
 function uid(prefix="id"){
   return prefix + "_" + Math.random().toString(16).slice(2) + Date.now().toString(16);
@@ -259,30 +294,6 @@ function showAlert(type, msg){
 }
 function hideAlert(){ $("#alertBox").classList.add("hide"); }
 function go(hash){ location.hash = hash; }
-
-/* ✅✅ تحميل ملف الدروس بأمان (حتى لا ينزل HTML إذا الملف مش موجود) */
-async function safeDownloadBackup(){
-  try{
-    const r = await fetch(BACKUP_FILE_URL, { cache: "no-store" });
-    if(!r.ok){
-      showAlert("bad","ملف الدروس غير موجود على الموقع. ارفع btec-backup.json بجانب index.html");
-      return;
-    }
-    const ct = (r.headers.get("content-type") || "").toLowerCase();
-    if(!ct.includes("application/json") && !ct.includes("text/json")){
-      showAlert("bad","الملف الموجود ليس JSON (يبدو صفحة HTML). تأكد أنك رفعت btec-backup.json الصحيح.");
-      return;
-    }
-    const a = document.createElement("a");
-    a.href = BACKUP_FILE_URL;
-    a.download = "btec-backup.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  }catch(e){
-    showAlert("bad","فشل تحميل ملف الدروس. تحقق من الرابط/الانترنت.");
-  }
-}
 
 /* ---------- Session ---------- */
 function getSession(){
@@ -446,6 +457,26 @@ function route(){
   renderHome();
 }
 
+/* ============================================================================
+   ✅ زر تحميل ملف الدروس (ينشئ ملف JSON ويعمل Download)
+============================================================================ */
+function downloadLessonsFile(){
+  try{
+    const content = JSON.stringify(EMBEDDED_BACKUP_DB, null, 2);
+    const blob = new Blob([content], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "btec-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+    showAlert("ok","تم تنزيل ملف الدروس ✅");
+  }catch(e){
+    showAlert("bad","تعذر تنزيل ملف الدروس.");
+  }
+}
+
 /* ---------- Pages ---------- */
 function renderHome(){
   const db = loadDB();
@@ -480,20 +511,20 @@ function renderHome(){
       ${lastHtml}
     </div>
 
-    <!-- ✅✅✅ بطاقة ملف الدروس (بدل الرسالة القديمة + بدون استيراد تلقائي) -->
+    <!-- ✅✅✅ مكان ملاحظة 📌 + زر تحميل/رفع ملف الدروس -->
     <div class="card soft" style="grid-column: 1/-1;">
       <div class="cardHeader">
         <div>
           <div class="h2">📌 مهم: لإظهار الدروس على أي جهاز</div>
           <div class="muted">
             المنصة بدون سيرفر، لذلك البيانات (الدروس/المهام) تكون محفوظة داخل المتصفح فقط.<br>
-            إذا ما ظهرت الدروس عندك: ارفع/استيراد ملف الدروس مرة واحدة.
+            إذا ما ظهرت الدروس عندك: حمّل ملف الدروس وارفعة مرة واحدة على جهازك.
           </div>
         </div>
       </div>
 
       <div class="row">
-        <button class="btn ok" onclick="safeDownloadBackup()">تحميل ملف الدروس</button>
+        <button class="btn ok" onclick="downloadLessonsFile()">تحميل ملف الدروس</button>
 
         <label class="btn ghost" style="cursor:pointer;">
           رفع / استيراد ملف الدروس
@@ -705,9 +736,7 @@ function renderPythonLesson(id){
               ${
                 (s.bullets||[]).length ? `<ul>${s.bullets.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>` : `<div class="muted">—</div>`
               }
-              ${
-                s.code ? `<pre>${esc(s.code)}</pre>` : ``
-              }
+              ${ s.code ? `<pre>${esc(s.code)}</pre>` : `` }
             </div>
           `).join("") : `<div class="muted">لا يوجد شرائح بعد.</div>`
         }
@@ -917,13 +946,13 @@ function renderAdmin(){
           <div class="muted">تحكم كامل بالأسماء: الجيل / المهمة / المستند / درس بايثون.</div>
         </div>
 
-        <!-- ✅✅✅ تم حذف زر تصدير البيانات + حذف زر الاستيراد التلقائي -->
+        <!-- ✅✅✅ حذف زر تصدير البيانات + لا يوجد استيراد تلقائي -->
         <div class="row">
           <button class="btn ghost dark" onclick="go('#/')">عرض الموقع</button>
 
           <label class="btn ghost" style="cursor:pointer;">
             استيراد البيانات
-            <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
+            <input type="file" accept="application/json" style="display:none" onchange="importDB(this.files[0])">
           </label>
 
           <button class="btn danger" onclick="resetAll()">إعادة ضبط البيانات</button>
@@ -1187,7 +1216,6 @@ function delTask(id){
   route();
 }
 
-/* --- Dependent dropdown for uploading docs: gen -> tasks --- */
 function refreshDocTasks(){
   const db = loadDB();
   const genId = $("#docGenId")?.value;
@@ -1262,7 +1290,7 @@ function downloadTaskDoc(id){
   a.remove();
 }
 
-/* ---------- Python lesson draft ---------- */
+/* ---------- Python draft ---------- */
 let PY_DRAFT = [];
 
 function resetDraftUI(){
@@ -1317,7 +1345,6 @@ function removeDraftSlide(i){
   renderDraftPreview();
 }
 
-/* ✅ حفظ الدرس */
 function addPythonLesson(){
   const db = loadDB();
 
@@ -1371,7 +1398,7 @@ function delPythonLesson(id){
 }
 
 /* ============================================================================
-   ✅ استيراد قاعدة البيانات (يدوي فقط)
+   ✅ استيراد قاعدة البيانات (يدوي)
 ============================================================================ */
 function importDB(file){
   if(!file) return;
